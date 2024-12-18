@@ -2,8 +2,8 @@ package dev.skippaddin.allAndOnlyChests.menuSystem.menu;
 
 import dev.skippaddin.allAndOnlyChests.AllAndOnlyChests;
 import dev.skippaddin.allAndOnlyChests.menuSystem.Menu;
-import dev.skippaddin.allAndOnlyChests.menuSystem.PlayerMenuUtility;
-import dev.skippaddin.allAndOnlyChests.menuSystem.StructureItemUtility;
+import dev.skippaddin.allAndOnlyChests.menuSystem.utility.PlayerMenuUtility;
+import dev.skippaddin.allAndOnlyChests.menuSystem.utility.StructureItemUtility;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemStack;

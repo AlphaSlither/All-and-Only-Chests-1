@@ -1,4 +1,4 @@
-package dev.skippaddin.allAndOnlyChests.menuSystem;
+package dev.skippaddin.allAndOnlyChests.menuSystem.utility;
 
 import org.bukkit.entity.Player;
 

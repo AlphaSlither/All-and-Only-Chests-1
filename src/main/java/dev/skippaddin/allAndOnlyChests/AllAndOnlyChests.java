@@ -2,7 +2,7 @@ package dev.skippaddin.allAndOnlyChests;
 
 import dev.skippaddin.allAndOnlyChests.commands.StructuresCommand;
 import dev.skippaddin.allAndOnlyChests.listeners.MenuListener;
-import dev.skippaddin.allAndOnlyChests.menuSystem.PlayerMenuUtility;
+import dev.skippaddin.allAndOnlyChests.menuSystem.utility.PlayerMenuUtility;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -35,7 +35,7 @@ public final class AllAndOnlyChests extends JavaPlugin {
         put("monster_room", false);
     }};
 
-    private static String selectedStructure = "ocean_ruin";
+    private static String selectedStructure = "";
 
     private static final HashMap<Material, Boolean> ancientCityLoot = new HashMap<>() {{
         put(Material.COAL, false);

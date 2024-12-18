@@ -1,5 +1,6 @@
 package dev.skippaddin.allAndOnlyChests.menuSystem;
 
+import dev.skippaddin.allAndOnlyChests.menuSystem.utility.PlayerMenuUtility;
 import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.event.inventory.InventoryClickEvent;

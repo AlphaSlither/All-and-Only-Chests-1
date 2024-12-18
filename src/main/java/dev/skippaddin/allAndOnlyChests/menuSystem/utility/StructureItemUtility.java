@@ -1,12 +1,9 @@
-package dev.skippaddin.allAndOnlyChests.menuSystem;
+package dev.skippaddin.allAndOnlyChests.menuSystem.utility;
 
-import com.google.common.collect.Multimap;
 import dev.skippaddin.allAndOnlyChests.AllAndOnlyChests;
 import org.bukkit.ChatColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
-import org.bukkit.attribute.Attribute;
-import org.bukkit.attribute.AttributeModifier;
 import org.bukkit.block.banner.Pattern;
 import org.bukkit.block.banner.PatternType;
 import org.bukkit.enchantments.Enchantment;
@@ -63,6 +60,7 @@ public final class StructureItemUtility {
                 ItemStack buriedTreasureItem = new ItemStack(Material.IRON_SHOVEL);
                 ItemMeta buriedTreasureItemMeta = buriedTreasureItem.getItemMeta();
                 generateItemMeta(buriedTreasureItemMeta, structure, AllAndOnlyChests.getBuriedTreasureLoot());
+                buriedTreasureItemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                 buriedTreasureItem.setItemMeta(buriedTreasureItemMeta);
                 return buriedTreasureItem;
             case "desert_pyramid":
@@ -104,8 +102,8 @@ public final class StructureItemUtility {
             case "pillager_outpost":
                 ItemStack pillagerOutpostItem = new ItemStack(Material.WHITE_BANNER);
                 ItemMeta pillagerOutpostItemMeta = pillagerOutpostItem.getItemMeta();
-                generateItemMeta(pillagerOutpostItemMeta, structure, AllAndOnlyChests.getPillagerOutpostLoot());
                 BannerMeta bannerMeta = getBannerMeta((BannerMeta) pillagerOutpostItemMeta);
+                generateItemMeta(bannerMeta, structure, AllAndOnlyChests.getPillagerOutpostLoot());
                 pillagerOutpostItem.setItemMeta(bannerMeta);
                 return pillagerOutpostItem;
             case "ruined_portal":
@@ -152,6 +150,7 @@ public final class StructureItemUtility {
                 ItemStack monsterRoomItem = new ItemStack(Material.SPAWNER);
                 ItemMeta monsterRoomItemMeta = monsterRoomItem.getItemMeta();
                 generateItemMeta(monsterRoomItemMeta, structure, AllAndOnlyChests.getMonsterRoomLoot());
+                monsterRoomItemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
                 monsterRoomItem.setItemMeta(monsterRoomItemMeta);
                 return monsterRoomItem;
             default:
@@ -160,8 +159,7 @@ public final class StructureItemUtility {
     }
 
     private static BannerMeta getBannerMeta(BannerMeta pillagerOutpostItemMeta) {
-        BannerMeta bannerMeta = pillagerOutpostItemMeta;
-        bannerMeta.setPatterns(List.of(
+        pillagerOutpostItemMeta.setPatterns(List.of(
                 new Pattern(DyeColor.CYAN, PatternType.RHOMBUS),
                 new Pattern(DyeColor.LIGHT_GRAY, PatternType.STRIPE_BOTTOM),
                 new Pattern(DyeColor.GRAY, PatternType.STRIPE_CENTER),
@@ -171,11 +169,13 @@ public final class StructureItemUtility {
                 new Pattern(DyeColor.LIGHT_GRAY, PatternType.CIRCLE),
                 new Pattern(DyeColor.BLACK, PatternType.BORDER)
         ));
-        return bannerMeta;
+        pillagerOutpostItemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        return pillagerOutpostItemMeta;
     }
 
 
     private static void generateItemMeta(ItemMeta itemMeta, String structure, HashMap<Material, Boolean> loot) {
+        itemMeta.setItemName(structure);
         String displayName = formatString(structure);
         int maxCount = loot.size();
         if (structure.equals(AllAndOnlyChests.getSelectedStructure())) {
