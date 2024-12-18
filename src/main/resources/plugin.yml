@@ -1,0 +1,9 @@
+name: AllAndOnlyChests
+version: '1.0-SNAPSHOT'
+main: dev.skippaddin.allAndOnlyChests.AllAndOnlyChests
+api-version: '1.21'
+commands:
+  structures:
+    description: Shows all unfinished and finished structures. Select your structure here.
+    permissions: AllAndOnlyChest.structures
+    default: op

@@ -1,0 +1,656 @@
+package dev.skippaddin.allAndOnlyChests;
+
+import dev.skippaddin.allAndOnlyChests.commands.StructuresCommand;
+import dev.skippaddin.allAndOnlyChests.listeners.MenuListener;
+import dev.skippaddin.allAndOnlyChests.menuSystem.PlayerMenuUtility;
+import org.bukkit.Material;
+import org.bukkit.entity.Player;
+import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.HashMap;
+
+
+public final class AllAndOnlyChests extends JavaPlugin {
+
+    private static final HashMap<Player, PlayerMenuUtility> playerMenuUtilityMap = new HashMap<>();
+
+    //Cold and warm ocean ruin!!!! Multiple ruined portals!!! Multiple shipwrecks!!! Trial Chambers noch adden!!! Mineshaft mesa, Multiple villages
+    private static final HashMap<String, Boolean> structures = new HashMap<>() {{
+        put("ancient_city", false);
+        put("bastion_remnant", false);
+        put("buried_treasure" , false);
+        put("desert_pyramid", false);
+        put("end_city", false);
+        put("fortress", false);
+        put("igloo", false);
+        put("jungle_pyramid", false);
+        put("ocean_ruin", false);
+        put("pillager_outpost", false);
+        put("ruined_portal", false);
+        put("shipwreck", false);
+        put("stronghold", false);
+        put("mineshaft", false);
+        put("village", false);
+        put("mansion", false);
+        put("monster_room", false);
+    }};
+
+    private static String selectedStructure = "ocean_ruin";
+
+    private static final HashMap<Material, Boolean> ancientCityLoot = new HashMap<>() {{
+        put(Material.COAL, false);
+        put(Material.BONE, false);
+        put(Material.SOUL_TORCH, false);
+        put(Material.BOOK, false);
+        put(Material.ENCHANTED_BOOK, false);
+        put(Material.DISC_FRAGMENT_5, false);
+        put(Material.ECHO_SHARD, false);
+        put(Material.AMETHYST_SHARD, false);
+        put(Material.GLOW_BERRIES, false);
+        put(Material.SCULK, false);
+        put(Material.CANDLE, false);
+        put(Material.EXPERIENCE_BOTTLE, false);
+        put(Material.SCULK_SENSOR, false);
+        put(Material.IRON_LEGGINGS, false);
+        put(Material.SCULK_CATALYST, false);
+        put(Material.COMPASS, false);
+        put(Material.MUSIC_DISC_13, false);
+        put(Material.MUSIC_DISC_CAT, false);
+        put(Material.LEAD, false);
+        put(Material.NAME_TAG, false);
+        put(Material.SADDLE, false);
+        put(Material.DIAMOND_HOE, false);
+        put(Material.DIAMOND_HORSE_ARMOR, false);
+        put(Material.DIAMOND_LEGGINGS, false);
+        put(Material.ENCHANTED_GOLDEN_APPLE, false);
+        put(Material.MUSIC_DISC_OTHERSIDE, false);
+        put(Material.WARD_ARMOR_TRIM_SMITHING_TEMPLATE, false);
+        put(Material.SILENCE_ARMOR_TRIM_SMITHING_TEMPLATE, false);
+        put(Material.SNOWBALL, false);
+        put(Material.PACKED_ICE, false);
+        put(Material.BAKED_POTATO, false);
+        put(Material.GOLDEN_CARROT, false);
+        put(Material.SUSPICIOUS_STEW, false);
+        put(Material.POTION, false);
+    }};
+
+    //!!!!!!!!!!!!!! Check if enchanted crossbow and golden armor and normal. golden boots with soul speed. Enchanted dia pickaxe and dia shovel and dia sword and dia armor !!!!!!!!!!!!!!!!!!!
+    private static final HashMap<Material, Boolean> bastionRemnantLoot = new HashMap<>() {{
+        put(Material.LODESTONE, false);
+        put(Material.ARROW, false);
+        put(Material.IRON_NUGGET, false);
+        put(Material.GOLD_NUGGET, false);
+        put(Material.STRING, false);
+        put(Material.LEATHER, false);
+        put(Material.SPECTRAL_ARROW, false);
+        put(Material.GILDED_BLACKSTONE, false);
+        put(Material.IRON_INGOT, false);
+        put(Material.GOLD_INGOT, false);
+        put(Material.CRYING_OBSIDIAN, false);
+        put(Material.CROSSBOW, false);
+        put(Material.GOLD_BLOCK, false);
+        put(Material.GOLDEN_SWORD, false);
+        put(Material.GOLDEN_AXE, false);
+        put(Material.GOLDEN_HELMET, false);
+        put(Material.GOLDEN_CHESTPLATE, false);
+        put(Material.GOLDEN_LEGGINGS, false);
+        put(Material.GOLDEN_BOOTS, false);
+        put(Material.NETHERITE_UPGRADE_SMITHING_TEMPLATE, false);
+        put(Material.SNOUT_ARMOR_TRIM_SMITHING_TEMPLATE, false);
+        put(Material.MAGMA_CREAM, false);
+        put(Material.CHAIN, false);
+        put(Material.OBSIDIAN, false);
+        put(Material.IRON_BLOCK, false);
+        put(Material.IRON_SWORD, false);
+        put(Material.BONE_BLOCK, false);
+        put(Material.COOKED_PORKCHOP, false);
+        put(Material.GOLDEN_CARROT, false);
+        put(Material.ANCIENT_DEBRIS, false);
+        put(Material.ENCHANTED_BOOK, false);
+        put(Material.PIGLIN_BANNER_PATTERN, false);
+        put(Material.GOLDEN_APPLE, false);
+        put(Material.DIAMOND_SHOVEL, false);
+        put(Material.DIAMOND_PICKAXE, false);
+        put(Material.MUSIC_DISC_PIGSTEP, false);
+        put(Material.NETHERITE_SCRAP, false);
+        put(Material.CRIMSON_FUNGUS, false);
+        put(Material.CRIMSON_NYLIUM, false);
+        put(Material.CRIMSON_ROOTS, false);
+        put(Material.GLOWSTONE, false);
+        put(Material.SOUL_SAND, false);
+        put(Material.PORKCHOP, false);
+        put(Material.SADDLE, false);
+        put(Material.NETHERITE_INGOT, false);
+        put(Material.QUARTZ, false);
+        put(Material.DIAMOND_SWORD, false);
+        put(Material.DIAMOND_HELMET, false);
+        put(Material.DIAMOND_CHESTPLATE, false);
+        put(Material.DIAMOND_LEGGINGS, false);
+        put(Material.DIAMOND_BOOTS, false);
+        put(Material.DIAMOND, false);
+        put(Material.ENCHANTED_GOLDEN_APPLE, false);
+    }};
+
+    private static final HashMap<Material, Boolean> bastionRemnantEnchanted = new HashMap<>() {{
+        put(Material.CROSSBOW, false);
+        put(Material.GOLDEN_HELMET, false);
+        put(Material.GOLDEN_CHESTPLATE, false);
+        put(Material.GOLDEN_LEGGINGS, false);
+        put(Material.GOLDEN_BOOTS, false);
+        put(Material.DIAMOND_PICKAXE, false);
+        put(Material.DIAMOND_SHOVEL, false);
+        put(Material.DIAMOND_SWORD, false);
+        put(Material.DIAMOND_HELMET, false);
+        put(Material.DIAMOND_CHESTPLATE, false);
+        put(Material.DIAMOND_LEGGINGS, false);
+        put(Material.DIAMOND_BOOTS, false);
+    }};
+
+    private static final HashMap<Material, Boolean> shipwreckLoot = new HashMap<>() {{
+        put(Material.SUSPICIOUS_STEW, false);
+        put(Material.PAPER, false);
+        put(Material.WHEAT, false);
+        put(Material.CARROT, false);
+        put(Material.POISONOUS_POTATO, false);
+        put(Material.POTATO, false);
+        put(Material.MOSS_BLOCK, false);
+        put(Material.COAL, false);
+        put(Material.ROTTEN_FLESH, false);
+        put(Material.GUNPOWDER, false);
+        put(Material.LEATHER_HELMET, false);
+        put(Material.LEATHER_CHESTPLATE, false);
+        put(Material.LEATHER_LEGGINGS, false);
+        put(Material.LEATHER_BOOTS, false);
+        put(Material.COAST_ARMOR_TRIM_SMITHING_TEMPLATE, false);
+        put(Material.BAMBOO, false);
+        put(Material.PUMPKIN, false);
+        put(Material.TNT, false);
+        put(Material.IRON_INGOT, false);
+        put(Material.IRON_NUGGET, false);
+        put(Material.EMERALD, false);
+        put(Material.LAPIS_LAZULI, false);
+        put(Material.GOLD_NUGGET, false);
+        put(Material.GOLD_INGOT, false);
+        put(Material.EXPERIENCE_BOTTLE, false);
+        put(Material.DIAMOND, false);
+        put(Material.MAP, false);
+        put(Material.FILLED_MAP, false);
+        put(Material.FEATHER, false);
+        put(Material.BOOK, false);
+        put(Material.CLOCK, false);
+        put(Material.COMPASS, false);
+    }};
+
+    private static final HashMap<Material, Boolean> buriedTreasureLoot = new HashMap<>() {{
+        put(Material.HEART_OF_THE_SEA, false);
+        put(Material.IRON_INGOT, false);
+        put(Material.GOLD_INGOT, false);
+        put(Material.COOKED_COD, false);
+        put(Material.COOKED_SALMON, false);
+        put(Material.POTION, false);
+        put(Material.TNT, false);
+        put(Material.EMERALD, false);
+        put(Material.PRISMARINE_CRYSTALS, false);
+        put(Material.DIAMOND, false);
+        put(Material.LEATHER_CHESTPLATE, false);
+        put(Material.IRON_SWORD, false);
+    }};
+
+    private static final HashMap<Material, Boolean> desertPyramidLoot = new HashMap<>() {{
+        put(Material.BONE, false);
+        put(Material.ROTTEN_FLESH, false);
+        put(Material.GUNPOWDER, false);
+        put(Material.SAND, false);
+        put(Material.STRING, false);
+        put(Material.SPIDER_EYE, false);
+        put(Material.ENCHANTED_BOOK, false);
+        put(Material.SADDLE, false);
+        put(Material.GOLDEN_APPLE, false);
+        put(Material.GOLD_INGOT, false);
+        put(Material.IRON_INGOT, false);
+        put(Material.EMERALD, false);
+        put(Material.IRON_HORSE_ARMOR, false);
+        put(Material.DUNE_ARMOR_TRIM_SMITHING_TEMPLATE, false);
+        put(Material.GOLDEN_HORSE_ARMOR, false);
+        put(Material.DIAMOND, false);
+        put(Material.DIAMOND_HORSE_ARMOR, false);
+        put(Material.ENCHANTED_GOLDEN_APPLE, false);
+    }};
+
+    private static final HashMap<Material, Boolean> endCityLoot = new HashMap<>() {{
+        put(Material.GOLD_INGOT, false);
+        put(Material.IRON_INGOT, false);
+        put(Material.BEETROOT_SEEDS, false);
+        put(Material.DIAMOND, false);
+        put(Material.SADDLE, false);
+        put(Material.IRON_PICKAXE, false);
+        put(Material.IRON_SHOVEL, false);
+        put(Material.IRON_SWORD, false);
+        put(Material.IRON_HELMET, false);
+        put(Material.IRON_CHESTPLATE, false);
+        put(Material.IRON_LEGGINGS, false);
+        put(Material.IRON_BOOTS, false);
+        put(Material.DIAMOND_PICKAXE, false);
+        put(Material.DIAMOND_SHOVEL, false);
+        put(Material.DIAMOND_SWORD, false);
+        put(Material.DIAMOND_HELMET, false);
+        put(Material.DIAMOND_CHESTPLATE, false);
+        put(Material.DIAMOND_LEGGINGS, false);
+        put(Material.DIAMOND_BOOTS, false);
+        put(Material.EMERALD, false);
+        put(Material.SPIRE_ARMOR_TRIM_SMITHING_TEMPLATE, false);
+        put(Material.IRON_HORSE_ARMOR, false);
+        put(Material.GOLDEN_HORSE_ARMOR, false);
+        put(Material.DIAMOND_HORSE_ARMOR, false);
+    }};
+
+    private static final HashMap<Material, Boolean> netherFortressLoot = new HashMap<>() {{
+        put(Material.GOLD_INGOT, false);
+        put(Material.SADDLE, false);
+        put(Material.GOLDEN_HORSE_ARMOR, false);
+        put(Material.NETHER_WART, false);
+        put(Material.IRON_INGOT, false);
+        put(Material.DIAMOND, false);
+        put(Material.FLINT_AND_STEEL, false);
+        put(Material.IRON_HORSE_ARMOR, false);
+        put(Material.GOLDEN_SWORD, false);
+        put(Material.GOLDEN_CHESTPLATE, false);
+        put(Material.DIAMOND_HORSE_ARMOR, false);
+        put(Material.OBSIDIAN, false);
+        put(Material.RIB_ARMOR_TRIM_SMITHING_TEMPLATE, false);
+    }};
+
+    private static final HashMap<Material, Boolean> iglooLoot = new HashMap<>() {{
+        put(Material.GOLDEN_APPLE, false);
+        put(Material.COAL, false);
+        put(Material.APPLE, false);
+        put(Material.WHEAT, false);
+        put(Material.GOLD_NUGGET, false);
+        put(Material.ROTTEN_FLESH, false);
+        put(Material.STONE_AXE, false);
+        put(Material.EMERALD, false);
+    }};
+
+    private static final HashMap<Material, Boolean> junglePyramidLoot = new HashMap<>() {{
+        put(Material.BONE, false);
+        put(Material.ROTTEN_FLESH, false);
+        put(Material.GOLD_INGOT, false);
+        put(Material.BAMBOO, false);
+        put(Material.IRON_INGOT, false);
+        put(Material.WILD_ARMOR_TRIM_SMITHING_TEMPLATE, false);
+        put(Material.DIAMOND, false);
+        put(Material.SADDLE, false);
+        put(Material.EMERALD, false);
+        put(Material.ENCHANTED_BOOK, false);
+        put(Material.IRON_HORSE_ARMOR, false);
+        put(Material.GOLDEN_HORSE_ARMOR, false);
+        put(Material.DIAMOND_HORSE_ARMOR, false);
+    }};
+
+    private static final HashMap<Material, Boolean> oceanRuinLoot = new HashMap<>() {{
+        put(Material.COAL, false);
+        put(Material.WHEAT, false);
+        put(Material.GOLD_NUGGET, false);
+        put(Material.FILLED_MAP, false);
+        put(Material.ENCHANTED_BOOK, false);
+        put(Material.FISHING_ROD, false);
+        put(Material.EMERALD, false);
+        put(Material.LEATHER_CHESTPLATE, false);
+        put(Material.GOLDEN_APPLE, false);
+        put(Material.GOLDEN_HELMET, false);
+    }};
+
+    private static final HashMap<Material, Boolean> pillagerOutpostLoot = new HashMap<>() {{
+        put(Material.DARK_OAK_LOG, false);
+        put(Material.WHEAT, false);
+        put(Material.EXPERIENCE_BOTTLE, false);
+        put(Material.CARROT, false);
+        put(Material.POTATO, false);
+        put(Material.CROSSBOW, false);
+        put(Material.GOAT_HORN, false);
+        put(Material.ARROW, false);
+        put(Material.STRING, false);
+        put(Material.TRIPWIRE_HOOK, false);
+        put(Material.IRON_INGOT, false);
+        put(Material.SENTRY_ARMOR_TRIM_SMITHING_TEMPLATE, false);
+        put(Material.ENCHANTED_BOOK, false);
+    }};
+
+    private static final HashMap<Material, Boolean> ruinedPortalLoot = new HashMap<>() {{
+        put(Material.IRON_INGOT, false);
+        put(Material.FLINT, false);
+        put(Material.OBSIDIAN, false);
+        put(Material.FIRE_CHARGE, false);
+        put(Material.FLINT_AND_STEEL, false);
+        put(Material.GOLD_NUGGET, false);
+        put(Material.GOLDEN_APPLE, false);
+        put(Material.GOLDEN_AXE, false);
+        put(Material.GOLDEN_HOE, false);
+        put(Material.GOLDEN_PICKAXE, false);
+        put(Material.GOLDEN_SHOVEL, false);
+        put(Material.GOLDEN_SWORD, false);
+        put(Material.GOLDEN_HELMET, false);
+        put(Material.GOLDEN_CHESTPLATE, false);
+        put(Material.GOLDEN_LEGGINGS, false);
+        put(Material.GOLDEN_BOOTS, false);
+        put(Material.GLISTERING_MELON_SLICE, false);
+        put(Material.GOLDEN_CARROT, false);
+        put(Material.GOLD_INGOT, false);
+        put(Material.CLOCK, false);
+        put(Material.LIGHT_WEIGHTED_PRESSURE_PLATE, false);
+        put(Material.GOLDEN_HORSE_ARMOR, false);
+        put(Material.GOLD_BLOCK, false);
+        put(Material.BELL, false);
+        put(Material.ENCHANTED_GOLDEN_APPLE, false);
+    }};
+
+    private static final HashMap<Material, Boolean> strongholdLoot = new HashMap<>() {{
+        put(Material.APPLE, false);
+        put(Material.BREAD, false);
+        put(Material.IRON_INGOT, false);
+        put(Material.ENDER_PEARL, false);
+        put(Material.REDSTONE, false);
+        put(Material.GOLD_INGOT, false);
+        put(Material.IRON_PICKAXE, false);
+        put(Material.IRON_SWORD, false);
+        put(Material.IRON_HELMET, false);
+        put(Material.IRON_CHESTPLATE, false);
+        put(Material.IRON_LEGGINGS, false);
+        put(Material.IRON_BOOTS, false);
+        put(Material.EYE_ARMOR_TRIM_SMITHING_TEMPLATE, false);
+        put(Material.DIAMOND, false);
+        put(Material.MUSIC_DISC_OTHERSIDE, false);
+        put(Material.ENCHANTED_BOOK, false);
+        put(Material.SADDLE, false);
+        put(Material.IRON_HORSE_ARMOR, false);
+        put(Material.GOLDEN_APPLE, false);
+        put(Material.GOLDEN_HORSE_ARMOR, false);
+        put(Material.DIAMOND_HORSE_ARMOR, false);
+        put(Material.COAL, false);
+        put(Material.PAPER, false);
+        put(Material.BOOK, false);
+        put(Material.COMPASS, false);
+        put(Material.MAP, false);
+    }};
+
+    private static final HashMap<Material, Boolean> mineshaftLoot = new HashMap<>() {{
+        put(Material.RAIL, false);
+        put(Material.TORCH, false);
+        put(Material.NAME_TAG, false);
+        put(Material.GLOW_BERRIES, false);
+        put(Material.BREAD, false);
+        put(Material.GOLDEN_APPLE, false);
+        put(Material.COAL, false);
+        put(Material.BEETROOT_SEEDS, false);
+        put(Material.MELON_SEEDS, false);
+        put(Material.PUMPKIN_SEEDS, false);
+        put(Material.IRON_INGOT, false);
+        put(Material.ACTIVATOR_RAIL, false);
+        put(Material.DETECTOR_RAIL, false);
+        put(Material.POWERED_RAIL, false);
+        put(Material.LAPIS_LAZULI, false);
+        put(Material.REDSTONE, false);
+        put(Material.GOLD_INGOT, false);
+        put(Material.ENCHANTED_BOOK, false);
+        put(Material.DIAMOND, false);
+        put(Material.IRON_PICKAXE, false);
+        put(Material.ENCHANTED_GOLDEN_APPLE, false);
+    }};
+
+    private static final HashMap<Material, Boolean> villageLoot = new HashMap<>() {{
+        put(Material.BREAD, false);
+        put(Material.IRON_INGOT, false);
+        put(Material.EMERALD, false);
+        put(Material.IRON_HELMET, false);
+        put(Material.BEEF, false);
+        put(Material.MUTTON, false);
+        put(Material.PORKCHOP, false);
+        put(Material.WHEAT, false);
+        put(Material.COAL, false);
+        put(Material.PAPER, false);
+        put(Material.MAP, false);
+        put(Material.STICK, false);
+        put(Material.COMPASS, false);
+        put(Material.WHEAT_SEEDS, false);
+        put(Material.COD, false);
+        put(Material.BARREL, false);
+        put(Material.SALMON, false);
+        put(Material.WATER_BUCKET, false);
+        put(Material.FEATHER, false);
+        put(Material.FLINT, false);
+        put(Material.ARROW, false);
+        put(Material.EGG, false);
+        put(Material.STONE, false);
+        put(Material.STONE_BRICKS, false);
+        put(Material.CLAY_BALL, false);
+        put(Material.FLOWER_POT, false);
+        put(Material.SMOOTH_STONE, false);
+        put(Material.YELLOW_DYE, false);
+        put(Material.WHITE_WOOL, false);
+        put(Material.BLACK_WOOL, false);
+        put(Material.GRAY_WOOL, false);
+        put(Material.LIGHT_GRAY_WOOL, false);
+        put(Material.SHEARS, false);
+        put(Material.LEATHER_HELMET, false);
+        put(Material.LEATHER_CHESTPLATE, false);
+        put(Material.LEATHER_LEGGINGS, false);
+        put(Material.LEATHER_BOOTS, false);
+        put(Material.LEATHER, false);
+        put(Material.SADDLE, false);
+        put(Material.ROTTEN_FLESH, false);
+        put(Material.REDSTONE, false);
+        put(Material.LAPIS_LAZULI, false);
+        put(Material.GOLD_INGOT, false);
+        put(Material.IRON_PICKAXE, false);
+        put(Material.IRON_SHOVEL, false);
+        put(Material.DIAMOND, false);
+        put(Material.APPLE, false);
+        put(Material.OAK_SAPLING, false);
+        put(Material.OBSIDIAN, false);
+        put(Material.IRON_SWORD, false);
+        put(Material.IRON_CHESTPLATE, false);
+        put(Material.IRON_LEGGINGS, false);
+        put(Material.IRON_BOOTS, false);
+        put(Material.IRON_HORSE_ARMOR, false);
+        put(Material.GOLDEN_HORSE_ARMOR, false);
+        put(Material.DIAMOND_HORSE_ARMOR, false);
+        put(Material.CACTUS, false);
+        put(Material.DEAD_BUSH, false);
+        put(Material.BOOK, false);
+        put(Material.GREEN_DYE, false);
+        put(Material.POTATO, false);
+        put(Material.DANDELION, false);
+        put(Material.GOLD_NUGGET, false);
+        put(Material.POPPY, false);
+        put(Material.ACACIA_SAPLING, false);
+        put(Material.SHORT_GRASS, false);
+        put(Material.TALL_GRASS, false);
+        put(Material.TORCH, false);
+        put(Material.BUCKET, false);
+        put(Material.SNOW, false);
+        put(Material.BEETROOT_SEEDS, false);
+        put(Material.SNOW_BLOCK, false);
+        put(Material.BEETROOT_SOUP, false);
+        put(Material.BLUE_ICE, false);
+        put(Material.FURNACE, false);
+        put(Material.SPRUCE_LOG, false);
+        put(Material.SWEET_BERRIES, false);
+        put(Material.PUMPKIN_SEEDS, false);
+        put(Material.SPRUCE_SAPLING, false);
+        put(Material.FERN, false);
+        put(Material.LARGE_FERN, false);
+        put(Material.IRON_NUGGET, false);
+        put(Material.PUMPKIN_PIE, false);
+        put(Material.SPRUCE_SIGN, false);
+
+    }};
+
+    private static final HashMap<Material, Boolean> monsterRoomLoot = new HashMap<>() {{
+        put(Material.BONE, false);
+        put(Material.GUNPOWDER, false);
+        put(Material.ROTTEN_FLESH, false);
+        put(Material.STRING, false);
+        put(Material.WHEAT, false);
+        put(Material.BREAD, false);
+        put(Material.NAME_TAG, false);
+        put(Material.SADDLE, false);
+        put(Material.COAL, false);
+        put(Material.REDSTONE, false);
+        put(Material.MUSIC_DISC_13, false);
+        put(Material.MUSIC_DISC_CAT, false);
+        put(Material.IRON_HORSE_ARMOR, false);
+        put(Material.GOLDEN_APPLE, false);
+        put(Material.BEETROOT_SEEDS, false);
+        put(Material.MELON_SEEDS, false);
+        put(Material.PUMPKIN_SEEDS, false);
+        put(Material.IRON_INGOT, false);
+        put(Material.BUCKET, false);
+        put(Material.ENCHANTED_BOOK, false);
+        put(Material.GOLDEN_HORSE_ARMOR, false);
+        put(Material.GOLD_INGOT, false);
+        put(Material.DIAMOND_HORSE_ARMOR, false);
+        put(Material.MUSIC_DISC_OTHERSIDE, false);
+        put(Material.ENCHANTED_GOLDEN_APPLE, false);
+    }};
+
+    private static final HashMap<Material, Boolean> woodlandMansionLoot = new HashMap<>() {{
+        put(Material.BONE, false);
+        put(Material.GUNPOWDER, false);
+        put(Material.ROTTEN_FLESH, false);
+        put(Material.STRING, false);
+        put(Material.VEX_ARMOR_TRIM_SMITHING_TEMPLATE, false);
+        put(Material.RESIN_CLUMP, false);
+        put(Material.RESIN_BRICK, false);
+        put(Material.LEAD, false);
+        put(Material.NAME_TAG, false);
+        put(Material.MUSIC_DISC_13, false);
+        put(Material.MUSIC_DISC_CAT, false);
+        put(Material.GOLDEN_APPLE, false);
+        put(Material.DIAMOND_HOE, false);
+        put(Material.WHEAT, false);
+        put(Material.BREAD, false);
+        put(Material.COAL, false);
+        put(Material.REDSTONE, false);
+        put(Material.ENCHANTED_BOOK, false);
+        put(Material.CHAINMAIL_CHESTPLATE, false);
+        put(Material.BEETROOT_SEEDS, false);
+        put(Material.MELON_SEEDS, false);
+        put(Material.PUMPKIN_SEEDS, false);
+        put(Material.IRON_INGOT, false);
+        put(Material.BUCKET, false);
+        put(Material.DIAMOND_CHESTPLATE, false);
+        put(Material.GOLD_INGOT, false);
+        put(Material.ENCHANTED_GOLDEN_APPLE, false);
+    }};
+
+    public static HashMap<String, Boolean> getStructures() {
+        return structures;
+    }
+
+    public static String getSelectedStructure() {
+        return selectedStructure;
+    }
+
+    public static void setSelectedStructure(String selectedStructure) {
+        AllAndOnlyChests.selectedStructure = selectedStructure;
+    }
+
+    public static HashMap<Material, Boolean> getWoodlandMansionLoot() {
+        return woodlandMansionLoot;
+    }
+
+    public static HashMap<Material, Boolean> getMonsterRoomLoot() {
+        return monsterRoomLoot;
+    }
+
+    public static HashMap<Material, Boolean> getVillageLoot() {
+        return villageLoot;
+    }
+
+    public static HashMap<Material, Boolean> getMineshaftLoot() {
+        return mineshaftLoot;
+    }
+
+    public static HashMap<Material, Boolean> getStrongholdLoot() {
+        return strongholdLoot;
+    }
+
+    public static HashMap<Material, Boolean> getRuinedPortalLoot() {
+        return ruinedPortalLoot;
+    }
+
+    public static HashMap<Material, Boolean> getPillagerOutpostLoot() {
+        return pillagerOutpostLoot;
+    }
+
+    public static HashMap<Material, Boolean> getOceanRuinLoot() {
+        return oceanRuinLoot;
+    }
+
+    public static HashMap<Material, Boolean> getJunglePyramidLoot() {
+        return junglePyramidLoot;
+    }
+
+    public static HashMap<Material, Boolean> getIglooLoot() {
+        return iglooLoot;
+    }
+
+    public static HashMap<Material, Boolean> getNetherFortressLoot() {
+        return netherFortressLoot;
+    }
+
+    public static HashMap<Material, Boolean> getAncientCityLoot() {
+        return ancientCityLoot;
+    }
+
+    public static HashMap<Material, Boolean> getShipwreckLoot() {
+        return shipwreckLoot;
+    }
+
+    public static HashMap<Material, Boolean> getBastionRemnantLoot() {
+        return bastionRemnantLoot;
+    }
+
+    public static HashMap<Material, Boolean> getBastionRemnantEnchanted() {
+        return bastionRemnantEnchanted;
+    }
+
+    public static HashMap<Material, Boolean> getBuriedTreasureLoot() {
+        return buriedTreasureLoot;
+    }
+
+    public static HashMap<Material, Boolean> getDesertPyramidLoot() {
+        return desertPyramidLoot;
+    }
+
+    public static HashMap<Material, Boolean> getEndCityLoot() {
+        return endCityLoot;
+    }
+
+    public static PlayerMenuUtility getPlayerMenuUtility(Player p) {
+        PlayerMenuUtility playerMenuUtility;
+        if (!playerMenuUtilityMap.containsKey(p)) {
+            playerMenuUtility = new PlayerMenuUtility(p);
+            playerMenuUtilityMap.put(p, playerMenuUtility);
+            return playerMenuUtility;
+        } else {
+            return playerMenuUtilityMap.get(p);
+        }
+    }
+
+    public static void removePlayerFromUtility(Player p) {
+        playerMenuUtilityMap.remove(p);
+    }
+
+    @Override
+    public void onEnable() {
+        // Plugin startup logic
+        getServer().getPluginManager().registerEvents(new MenuListener(), this);
+        getCommand("structures").setExecutor(new StructuresCommand());
+    }
+
+    @Override
+    public void onDisable() {
+        // Plugin shutdown logic
+    }
+}
