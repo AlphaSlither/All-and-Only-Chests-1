@@ -4,9 +4,14 @@ import dev.skippaddin.allAndOnlyChests.AllAndOnlyChests;
 import dev.skippaddin.allAndOnlyChests.menuSystem.Menu;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.CustomHeadUtility;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.PlayerMenuUtility;
+import dev.skippaddin.allAndOnlyChests.menuSystem.utility.StructureItemUtility;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
+import org.bukkit.Sound;
+import org.bukkit.enchantments.Enchantment;
+import org.bukkit.entity.Player;
 import org.bukkit.event.inventory.InventoryClickEvent;
+import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
 
@@ -19,12 +24,16 @@ public class StructureItemMenu extends Menu {
 
     private final ItemStack item;
 
-    private ArrayList<Material> items;
+    private final ArrayList<ItemStack> items = new ArrayList<>();
+
+    private int startIndex = 0;
 
     //Set to static so the server has to request the textures only once.
-    private static final ItemStack arrowUpItem = generateArrows(ChatColor.GREEN + "Scroll up", "http://textures.minecraft.net/texture/7d695d335e6be8cb2a34e05e18ea2d12c3b17b8166ba62d6982a643df71ffac5");
+    private static final ItemStack arrowUpItem = generateArrows(ChatColor.GREEN + "Scroll up", "http://textures" +
+            ".minecraft.net/texture/7d695d335e6be8cb2a34e05e18ea2d12c3b17b8166ba62d6982a643df71ffac5");
 
-    private static final ItemStack arrowDownItem = generateArrows(ChatColor.GREEN + "Scroll Down", "http://textures.minecraft.net/texture/437862cdc159998ed6b6fdccaaa4675867d4484db512a84c367fabf4caf60");
+    private static final ItemStack arrowDownItem = generateArrows(ChatColor.GREEN + "Scroll Down", "http://textures" +
+            ".minecraft.net/texture/437862cdc159998ed6b6fdccaaa4675867d4484db512a84c367fabf4caf60");
 
     public StructureItemMenu(PlayerMenuUtility playerMenuUtility, ItemStack item) {
         super(playerMenuUtility);
@@ -35,12 +44,14 @@ public class StructureItemMenu extends Menu {
         } else if (AllAndOnlyChests.getSelectedStructure().equals(itemMeta.getItemName())) {
             lore = ChatColor.GOLD + "Selected.";
         } else {
-            lore = ChatColor.RED + AllAndOnlyChests.getSelectedStructure() + " selected.";
+            String selectedStructure = StructureItemUtility.formatString(AllAndOnlyChests.getSelectedStructure());
+            lore = ChatColor.RED + selectedStructure + " selected.";
         }
         itemMeta.setLore(List.of(lore));
         item.setItemMeta(itemMeta);
         this.item = item;
     }
+
 
     private static ItemStack generateArrows(String display, String url) {
         ItemStack itemStack = CustomHeadUtility.getCustomHead(url);
@@ -52,6 +63,10 @@ public class StructureItemMenu extends Menu {
 
     @Override
     public String getMenuName() {
+        if (item.getItemMeta().getItemName().equals("bastion_remnant") || item.getItemMeta().getItemName().equals("mansion")) {
+            String menuName = StructureItemUtility.formatString(item.getItemMeta().getItemName());
+            return ChatColor.DARK_GRAY + menuName;
+        }
         return item.getItemMeta().getDisplayName();
     }
 
@@ -62,11 +77,115 @@ public class StructureItemMenu extends Menu {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
+        if (e.getView().getTopInventory().equals(e.getInventory())) {
+            if (e.getSlot() == 0) {
+                new StructureMenu(playerMenuUtility).open();
+            } else if (e.getSlot() == 53 && e.getCurrentItem().getType() == Material.PLAYER_HEAD) {
 
+                boolean scrollable = false;
+                startIndex += 40;
+
+                if (items.size() - startIndex > 40) {
+                    scrollable = true;
+                }
+
+                int modBy = 17;
+                int invPos = 9;
+
+                for (int i = startIndex; i < items.size(); i++) {
+                    if (invPos > 52) {
+                        break;
+                    }
+
+                    inventory.setItem(invPos, items.get(i));
+
+                    invPos++;
+
+                    if (invPos % modBy == 0) {
+                        modBy += 9;
+                        invPos++;
+                    }
+                }
+
+                if (!scrollable) {
+                    ItemStack grayGlass = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+                    ItemMeta grayGlassMeta = grayGlass.getItemMeta();
+                    grayGlassMeta.setHideTooltip(true);
+                    grayGlass.setItemMeta(grayGlassMeta);
+                    inventory.setItem(53, grayGlass);
+                }
+
+                while (invPos < 53) {
+                    ItemStack air = new ItemStack(Material.AIR);
+                    inventory.setItem(invPos, air);
+
+                    invPos++;
+                    if (invPos % modBy == 0) {
+                        modBy += 9;
+                        invPos++;
+                    }
+                }
+
+                inventory.setItem(8, arrowUpItem);
+
+            } else if (e.getSlot() == 8 && e.getCurrentItem().getType() == Material.PLAYER_HEAD) {
+                boolean scrollable = false;
+                startIndex -= 40;
+
+                if (startIndex != 0) {
+                    scrollable = true;
+                }
+
+                int modBy = 17;
+                int invPos = 9;
+
+                for (int i = startIndex; i < items.size(); i++) {
+                    if (invPos > 52) {
+                        break;
+                    }
+
+                    inventory.setItem(invPos, items.get(i));
+
+                    invPos++;
+
+                    if (invPos % modBy == 0) {
+                        modBy += 9;
+                        invPos++;
+                    }
+                }
+
+                inventory.setItem(53, arrowDownItem);
+
+                if (!scrollable) {
+                    ItemStack grayGlass = new ItemStack(Material.GRAY_STAINED_GLASS_PANE);
+                    ItemMeta grayGlassMeta = grayGlass.getItemMeta();
+                    grayGlassMeta.setHideTooltip(true);
+                    grayGlass.setItemMeta(grayGlassMeta);
+                    inventory.setItem(8, grayGlass);
+                }
+
+            } else if (e.getSlot() == 4) {
+                if (AllAndOnlyChests.getSelectedStructure().isEmpty()) {
+                    Player player = playerMenuUtility.getOwner();
+                    String itemName = item.getItemMeta().getItemName();
+                    AllAndOnlyChests.setSelectedStructure(itemName);
+                    player.closeInventory();
+                    if (!itemName.equals("bastion_remnant") && !itemName.equals("mansion")) {
+                        player.sendTitle(ChatColor.YELLOW + item.getItemMeta().getDisplayName(), ChatColor.YELLOW + "started!");
+                    } else {
+                        String title = StructureItemUtility.formatString(itemName);
+                        player.sendTitle(ChatColor.YELLOW + title, ChatColor.YELLOW + "started!");
+                    }
+                    player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+                }
+            }
+        }
     }
 
     @Override
     public void setMenuItems() {
+        inventory.setItem(4, item);
+
         ItemStack arrow = new ItemStack(Material.ARROW);
         ItemMeta arrowMeta = arrow.getItemMeta();
         arrowMeta.setDisplayName(ChatColor.YELLOW + "Back");
@@ -94,54 +213,75 @@ public class StructureItemMenu extends Menu {
         inventory.setItem(5, greenGlass);
 
         if (!item.getItemMeta().getItemName().equals("bastion_remnant")) {
-            items = AllAndOnlyChests.getStructureMaterials(true, item.getItemMeta().getItemName());
+            for (HashMap.Entry<Material, Boolean> entry :
+                    AllAndOnlyChests.structureMaterials.get(item.getItemMeta().getItemName()).entrySet()) {
+                if (!entry.getValue()) {
+                    items.add(buildItem(entry.getKey()));
+                }
+            }
         } else {
-            items = new ArrayList<>();
+
+
             for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getBastionRemnantLoot().entrySet()) {
                 if (!entry.getValue()) {
-                    items.add(entry.getKey());
+                    items.add(buildItem(entry.getKey()));
                 }
             }
             for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getBastionRemnantEnchanted().entrySet()) {
                 if (!entry.getValue()) {
-                    items.add(entry.getKey());
+                    ItemStack itemStack = buildItem(entry.getKey());
+                    ItemMeta itemMeta = itemStack.getItemMeta();
+                    itemMeta.addEnchant(Enchantment.EFFICIENCY, 1, false);
+                    itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+                    itemStack.setItemMeta(itemMeta);
+                    items.add(itemStack);
                 }
             }
-            items.sort(new Comparator<Material>() {
+
+            items.sort(new Comparator<ItemStack>() {
                 @Override
-                public int compare(Material o1, Material o2) {
-                    return o1.toString().compareTo(o2.toString());
+                public int compare(ItemStack o1, ItemStack o2) {
+                    return o1.getType().toString().compareTo(o2.getType().toString());
                 }
             });
+
         }
 
-         if (items.size() > 40) {
-             inventory.setItem(8, arrowUpItem);
-             inventory.setItem(53, arrowDownItem);
-         } else {
-             inventory.setItem(8, grayGlass);
-             inventory.setItem(53, grayGlass);
-         }
 
-         int modBy = 17;
-         int invPos = 9;
+        if (items.size() > 40) {
+            inventory.setItem(53, arrowDownItem);
+        } else {
+            inventory.setItem(53, grayGlass);
+        }
 
-         for (Material material : items) {
+        inventory.setItem(8, grayGlass);
 
-             if (invPos > 52) {
-                 break;
-             }
+        int modBy = 17;
+        int invPos = 9;
 
-             ItemStack itemStack = new ItemStack(material);
-             inventory.setItem(invPos, itemStack);
+        for (ItemStack itemStack : items) {
 
-             invPos++;
+            if (invPos > 52) {
+                break;
+            }
+            inventory.setItem(invPos, itemStack);
 
-             if (invPos % modBy == 0) {
-                 modBy += 9;
-                 invPos++;
-             }
+            invPos++;
 
-         }
+            if (invPos % modBy == 0) {
+                modBy += 9;
+                invPos++;
+            }
+
+        }
+    }
+
+    private ItemStack buildItem(Material material) {
+        ItemStack item = new ItemStack(material);
+        ItemMeta itemMeta = item.getItemMeta();
+        itemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
+        item.setItemMeta(itemMeta);
+        return item;
     }
 }

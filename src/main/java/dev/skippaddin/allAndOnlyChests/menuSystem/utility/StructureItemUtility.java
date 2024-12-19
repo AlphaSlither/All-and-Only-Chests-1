@@ -196,7 +196,7 @@ public final class StructureItemUtility {
     }
 
 
-    private static String formatString(String name) {
+    public static String formatString(String name) {
         String[] words = name.split("_");
         StringBuilder displayName = new StringBuilder();
         displayName.append(Character.toUpperCase(words[0].charAt(0)) + words[0].substring(1));

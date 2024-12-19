@@ -1,16 +1,18 @@
 package dev.skippaddin.allAndOnlyChests;
 
 import dev.skippaddin.allAndOnlyChests.commands.StructuresCommand;
+import dev.skippaddin.allAndOnlyChests.listeners.DropItemListener;
 import dev.skippaddin.allAndOnlyChests.listeners.MenuListener;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.PlayerMenuUtility;
 import org.bukkit.Material;
 import org.bukkit.entity.Player;
+import org.bukkit.event.*;
 import org.bukkit.plugin.java.JavaPlugin;
 
 import java.util.*;
 
 
-public final class AllAndOnlyChests extends JavaPlugin {
+public final class AllAndOnlyChests extends JavaPlugin implements Listener {
 
     private static final HashMap<Player, PlayerMenuUtility> playerMenuUtilityMap = new HashMap<>();
 
@@ -34,6 +36,7 @@ public final class AllAndOnlyChests extends JavaPlugin {
         put("mansion", false);
         put("monster_room", false);
     }};
+
 
     private static String selectedStructure = "";
 
@@ -544,7 +547,7 @@ public final class AllAndOnlyChests extends JavaPlugin {
     }};
 
     // Bastion Remnant left out because it's a special case. Add logic case handling in listener
-    private static final HashMap<String, HashMap<Material, Boolean>> structureMaterials = new HashMap<>() {{
+    public static final HashMap<String, HashMap<Material, Boolean>> structureMaterials = new HashMap<>() {{
         put("ancient_city", ancientCityLoot);
         put("buried_treasure", buriedTreasureLoot);
         put("desert_pyramid", desertPyramidLoot);
@@ -563,16 +566,16 @@ public final class AllAndOnlyChests extends JavaPlugin {
         put("monster_room", monsterRoomLoot);
     }};
 
+    public static void setSelectedStructure(String selectedStructure) {
+        AllAndOnlyChests.selectedStructure = selectedStructure;
+    }
+
     public static HashMap<String, Boolean> getStructures() {
         return structures;
     }
 
     public static String getSelectedStructure() {
         return selectedStructure;
-    }
-
-    public static void setSelectedStructure(String selectedStructure) {
-        AllAndOnlyChests.selectedStructure = selectedStructure;
     }
 
     public static HashMap<Material, Boolean> getWoodlandMansionLoot() {
@@ -697,9 +700,33 @@ public final class AllAndOnlyChests extends JavaPlugin {
     @Override
     public void onEnable() {
         // Plugin startup logic
+//
+//        RegisteredListener registeredListener = new RegisteredListener(this, (listener, event) -> onEvent(event), EventPriority.NORMAL, this, false);
+//        for (HandlerList handler : HandlerList.getHandlerLists())
+//            handler.register(registeredListener);
+        getServer().getPluginManager().registerEvents(new DropItemListener(), this);
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
         getCommand("structures").setExecutor(new StructuresCommand());
     }
+
+//    @EventHandler
+//    public void onEvent(Event e) {
+//        if (e.getClass() != EntityAirChangeEvent.class &&
+//                e.getClass() != EntitiesUnloadEvent.class &&
+//                e.getClass() != EntityRemoveEvent.class &&
+//                e.getClass() != EntitiesLoadEvent.class && e.getClass()
+//                != ChunkLoadEvent.class &&
+//                e.getClass() != GenericGameEvent.class &&
+//                e.getClass() != PlayerMoveEvent.class &&
+//                e.getClass() != PlayerInputEvent.class &&
+//                e.getClass() != CreatureSpawnEvent.class &&
+//                e.getClass() != BatToggleSleepEvent.class &&
+//                e.getClass() != ChunkUnloadEvent.class &&
+//                e.getClass() != BlockPhysicsEvent.class &&
+//                e.getClass() != VehicleUpdateEvent.class) {
+//            System.out.println(e.getClass());
+//        }
+//    }
 
     @Override
     public void onDisable() {

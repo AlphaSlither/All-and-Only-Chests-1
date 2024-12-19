@@ -35,7 +35,7 @@ public class StructureMenu extends Menu {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-        if (e.getCurrentItem() != null) {
+        if (e.getCurrentItem() != null && e.getCurrentItem().getType() != Material.GRAY_STAINED_GLASS_PANE) {
             new StructureItemMenu(playerMenuUtility, e.getCurrentItem()).open();
         }
     }
