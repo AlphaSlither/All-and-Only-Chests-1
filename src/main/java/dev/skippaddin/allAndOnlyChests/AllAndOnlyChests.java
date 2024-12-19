@@ -7,7 +7,7 @@ import org.bukkit.Material;
 import org.bukkit.entity.Player;
 import org.bukkit.plugin.java.JavaPlugin;
 
-import java.util.HashMap;
+import java.util.*;
 
 
 public final class AllAndOnlyChests extends JavaPlugin {
@@ -543,6 +543,26 @@ public final class AllAndOnlyChests extends JavaPlugin {
         put(Material.ENCHANTED_GOLDEN_APPLE, false);
     }};
 
+    // Bastion Remnant left out because it's a special case. Add logic case handling in listener
+    private static final HashMap<String, HashMap<Material, Boolean>> structureMaterials = new HashMap<>() {{
+        put("ancient_city", ancientCityLoot);
+        put("buried_treasure", buriedTreasureLoot);
+        put("desert_pyramid", desertPyramidLoot);
+        put("end_city", endCityLoot);
+        put("fortress", netherFortressLoot);
+        put("igloo", iglooLoot);
+        put("jungle_pyramid", junglePyramidLoot);
+        put("ocean_ruin", oceanRuinLoot);
+        put("pillager_outpost", pillagerOutpostLoot);
+        put("ruined_portal", ruinedPortalLoot);
+        put("shipwreck", shipwreckLoot);
+        put("stronghold", strongholdLoot);
+        put("mineshaft", mineshaftLoot);
+        put("village", villageLoot);
+        put("mansion", woodlandMansionLoot);
+        put("monster_room", monsterRoomLoot);
+    }};
+
     public static HashMap<String, Boolean> getStructures() {
         return structures;
     }
@@ -625,6 +645,38 @@ public final class AllAndOnlyChests extends JavaPlugin {
 
     public static HashMap<Material, Boolean> getEndCityLoot() {
         return endCityLoot;
+    }
+
+    public static HashMap<Material, Boolean> getLoot(String structure) {
+        return structureMaterials.get(structure);
+    }
+
+    public static ArrayList<Material> getStructureMaterials(boolean filter, String structure) {
+        ArrayList<Material> materials = new ArrayList<>();
+
+        if (structureMaterials.containsKey(structure)) {
+            HashMap<Material, Boolean> materialMap = structureMaterials.get(structure);
+            // Could switch the first if statement, but this is more readable
+            for (HashMap.Entry<Material, Boolean> entry : materialMap.entrySet()) {
+                if (filter) {
+                    if (!entry.getValue()) {
+                        materials.add(entry.getKey());
+                    }
+                } else {
+                    materials.add(entry.getKey());
+                }
+            }
+        } else {
+            System.out.println("Structure not found");
+        }
+
+        materials.sort(new Comparator<Material>() {
+            @Override
+            public int compare(Material o1, Material o2) {
+                return o1.toString().compareTo(o2.toString());
+            }
+        });
+        return materials;
     }
 
     public static PlayerMenuUtility getPlayerMenuUtility(Player p) {

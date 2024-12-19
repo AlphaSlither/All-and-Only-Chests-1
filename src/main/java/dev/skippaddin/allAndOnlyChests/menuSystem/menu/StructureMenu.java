@@ -35,7 +35,9 @@ public class StructureMenu extends Menu {
 
     @Override
     public void handleMenu(InventoryClickEvent e) {
-
+        if (e.getCurrentItem() != null) {
+            new StructureItemMenu(playerMenuUtility, e.getCurrentItem()).open();
+        }
     }
 
     @Override

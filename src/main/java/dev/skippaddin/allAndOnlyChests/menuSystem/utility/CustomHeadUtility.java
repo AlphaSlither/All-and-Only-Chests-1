@@ -1,34 +1,32 @@
 package dev.skippaddin.allAndOnlyChests.menuSystem.utility;
 
-import com.mojang.authlib.GameProfile;
-import com.mojang.authlib.properties.Property;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.SkullMeta;
+import org.bukkit.profile.PlayerProfile;
 
-import java.lang.reflect.Field;
+import java.net.MalformedURLException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.UUID;
 
 public final class CustomHeadUtility {
 
     private CustomHeadUtility() {}
 
-    public static ItemStack getCustomHead(String textureBase64) {
-        ItemStack head = new ItemStack(Material.PLAYER_HEAD);
-        SkullMeta headMeta = (SkullMeta) head.getItemMeta();
-
-        GameProfile profile = new GameProfile(UUID.randomUUID(), null);
-        profile.getProperties().put("textures", new Property("textures", textureBase64));
-
+    public static ItemStack getCustomHead(String url) {
+        PlayerProfile playerProfile = Bukkit.createPlayerProfile(UUID.randomUUID());
         try {
-            Field profileField = headMeta.getClass().getDeclaredField("profile");
-            profileField.setAccessible(true);
-            profileField.set(headMeta, profile);
-        } catch (NoSuchFieldException | IllegalAccessException e) {
-            e.printStackTrace();
+            playerProfile.getTextures().setSkin(new URI(url).toURL());
+        } catch (MalformedURLException | URISyntaxException e) {
+            throw new RuntimeException(e);
         }
 
-        head.setItemMeta(headMeta);
+        ItemStack head = new ItemStack(Material.PLAYER_HEAD);
+        SkullMeta skullMeta = (SkullMeta) head.getItemMeta();
+        skullMeta.setOwnerProfile(playerProfile);
+        head.setItemMeta(skullMeta);
         return head;
     }
 
