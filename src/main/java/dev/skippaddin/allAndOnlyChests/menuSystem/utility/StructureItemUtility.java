@@ -28,13 +28,13 @@ public final class StructureItemUtility {
                 generateItemMeta(ancientCityItemItemMeta, structure, AllAndOnlyChests.getAncientCityLoot());
                 ancientCityItem.setItemMeta(ancientCityItemItemMeta);
                 return ancientCityItem;
-            case "bastion_remnant":
+            case "bastion":
                 ItemStack bastionRemnantItem = new ItemStack(Material.PIGLIN_HEAD);
                 ItemMeta bastionRemnantItemMeta = bastionRemnantItem.getItemMeta();
                 generateItemMeta(bastionRemnantItemMeta, structure, AllAndOnlyChests.getBastionRemnantLoot());
                 //Overwriting Lore because bastion remnant is special case because of non-enchanted and enchanted items
                 int maxCount = AllAndOnlyChests.getBastionRemnantLoot().size();
-                maxCount += AllAndOnlyChests.getBastionRemnantEnchanted().size();
+                maxCount += AllAndOnlyChests.getBastionRemnantEnchantedLoot().size();
                 if (structure.equals(AllAndOnlyChests.getSelectedStructure())) {
                     int collected = 0;
                     for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getBastionRemnantLoot().entrySet()) {
@@ -42,7 +42,7 @@ public final class StructureItemUtility {
                             collected++;
                         }
                     }
-                    for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getBastionRemnantEnchanted().entrySet()) {
+                    for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getBastionRemnantEnchantedLoot().entrySet()) {
                         if (entry.getValue()) {
                             collected++;
                         }
@@ -75,7 +75,7 @@ public final class StructureItemUtility {
                 generateItemMeta(endCityItemMeta, structure, AllAndOnlyChests.getEndCityLoot());
                 endCityItem.setItemMeta(endCityItemMeta);
                 return endCityItem;
-            case "fortress":
+            case "nether_bridge":
                 ItemStack fortressItem = new ItemStack(Material.BLAZE_ROD);
                 ItemMeta fortressItemMeta = fortressItem.getItemMeta();
                 generateItemMeta(fortressItemMeta, structure, AllAndOnlyChests.getNetherFortressLoot());
@@ -87,13 +87,13 @@ public final class StructureItemUtility {
                 generateItemMeta(iglooItemMeta, structure, AllAndOnlyChests.getIglooLoot());
                 iglooItem.setItemMeta(iglooItemMeta);
                 return iglooItem;
-            case "jungle_pyramid":
+            case "jungle_temple":
                 ItemStack junglePyramidItem = new ItemStack(Material.TRIPWIRE_HOOK);
                 ItemMeta junglePyramidItemMeta = junglePyramidItem.getItemMeta();
                 generateItemMeta(junglePyramidItemMeta, structure, AllAndOnlyChests.getJunglePyramidLoot());
                 junglePyramidItem.setItemMeta(junglePyramidItemMeta);
                 return junglePyramidItem;
-            case "ocean_ruin":
+            case "underwater_ruin":
                 ItemStack oceanRuinItem = new ItemStack(Material.POLISHED_GRANITE);
                 ItemMeta oceanRuinItemMeta = oceanRuinItem.getItemMeta();
                 generateItemMeta(oceanRuinItemMeta, structure, AllAndOnlyChests.getOceanRuinLoot());
@@ -136,7 +136,7 @@ public final class StructureItemUtility {
                 generateItemMeta(villageItemMeta, structure, AllAndOnlyChests.getVillageLoot());
                 villageItem.setItemMeta(villageItemMeta);
                 return villageItem;
-            case "mansion":
+            case "woodland_mansion":
                 ItemStack mansionItem = new ItemStack(Material.TOTEM_OF_UNDYING);
                 ItemMeta mansionItemMeta = mansionItem.getItemMeta();
                 generateItemMeta(mansionItemMeta, structure, AllAndOnlyChests.getWoodlandMansionLoot());
@@ -146,7 +146,7 @@ public final class StructureItemUtility {
                 }
                 mansionItem.setItemMeta(mansionItemMeta);
                 return mansionItem;
-            case "monster_room":
+            case "simple_dungeon":
                 ItemStack monsterRoomItem = new ItemStack(Material.SPAWNER);
                 ItemMeta monsterRoomItemMeta = monsterRoomItem.getItemMeta();
                 generateItemMeta(monsterRoomItemMeta, structure, AllAndOnlyChests.getMonsterRoomLoot());

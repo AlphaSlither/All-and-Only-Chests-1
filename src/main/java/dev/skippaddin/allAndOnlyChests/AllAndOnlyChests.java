@@ -1,42 +1,75 @@
 package dev.skippaddin.allAndOnlyChests;
 
 import dev.skippaddin.allAndOnlyChests.commands.StructuresCommand;
-import dev.skippaddin.allAndOnlyChests.listeners.DropItemListener;
+import dev.skippaddin.allAndOnlyChests.listeners.ItemListener;
 import dev.skippaddin.allAndOnlyChests.listeners.MenuListener;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.PlayerMenuUtility;
 import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
+import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.*;
+import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
+import org.bukkit.potion.PotionEffectType;
+import org.bukkit.potion.PotionType;
 
+import java.lang.reflect.Array;
 import java.util.*;
 
 
 public final class AllAndOnlyChests extends JavaPlugin implements Listener {
 
+    private static Plugin plugin;
+
+    private static final HashSet<Block> placedBlocks = new HashSet<>();
+
     private static final HashMap<Player, PlayerMenuUtility> playerMenuUtilityMap = new HashMap<>();
 
-    //Cold and warm ocean ruin!!!! Multiple ruined portals!!! Multiple shipwrecks!!! Trial Chambers noch adden!!! Mineshaft mesa, Multiple villages
-    private static final HashMap<String, Boolean> structures = new HashMap<>() {{
-        put("ancient_city", false);
-        put("bastion_remnant", false);
-        put("buried_treasure" , false);
-        put("desert_pyramid", false);
-        put("end_city", false);
-        put("fortress", false);
-        put("igloo", false);
-        put("jungle_pyramid", false);
-        put("ocean_ruin", false);
-        put("pillager_outpost", false);
-        put("ruined_portal", false);
-        put("shipwreck", false);
-        put("stronghold", false);
-        put("mineshaft", false);
-        put("village", false);
-        put("mansion", false);
-        put("monster_room", false);
-    }};
+    //Add trial chambers later. Bastion last, because it gets handled different
+    private static final String[] structures = new String[] {
+            "ancient_city",
+            "buried_treasure",
+            "desert_pyramid",
+            "end_city",
+            "nether_bridge",
+            "igloo",
+            "jungle_temple",
+            "underwater_ruin",
+            "pillager_outpost",
+            "ruined_portal",
+            "shipwreck",
+            "stronghold",
+            "mineshaft",
+            "village",
+            "woodland_mansion",
+            "simple_dungeon",
+            "bastion",
+            "trial_chambers"
+    };
 
+    //Cold and warm ocean ruin!!!! Multiple ruined portals!!! Multiple shipwrecks!!! Trial Chambers noch adden!!! Mineshaft mesa, Multiple villages
+    private static final HashMap<String, Boolean> structureProgress = new HashMap<>() {{
+        put(structures[0], false);
+        put(structures[1], false);
+        put(structures[2] , false);
+        put(structures[3], false);
+        put(structures[4], false);
+        put(structures[5], false);
+        put(structures[6], false);
+        put(structures[7], false);
+        put(structures[8], false);
+        put(structures[9], false);
+        put(structures[10], false);
+        put(structures[11], false);
+        put(structures[12], false);
+        put(structures[13], false);
+        put(structures[14], false);
+        put(structures[15], false);
+        put(structures[16], false);
+        put(structures[17], false);
+    }};
 
     private static String selectedStructure = "";
 
@@ -134,7 +167,7 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         put(Material.ENCHANTED_GOLDEN_APPLE, false);
     }};
 
-    private static final HashMap<Material, Boolean> bastionRemnantEnchanted = new HashMap<>() {{
+    private static final HashMap<Material, Boolean> bastionRemnantEnchantedLoot = new HashMap<>() {{
         put(Material.CROSSBOW, false);
         put(Material.GOLDEN_HELMET, false);
         put(Material.GOLDEN_CHESTPLATE, false);
@@ -430,6 +463,7 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         put(Material.SMOOTH_STONE, false);
         put(Material.YELLOW_DYE, false);
         put(Material.WHITE_WOOL, false);
+        put(Material.BROWN_WOOL, false);
         put(Material.BLACK_WOOL, false);
         put(Material.GRAY_WOOL, false);
         put(Material.LIGHT_GRAY_WOOL, false);
@@ -470,7 +504,7 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         put(Material.TALL_GRASS, false);
         put(Material.TORCH, false);
         put(Material.BUCKET, false);
-        put(Material.SNOW, false);
+        put(Material.SNOWBALL, false);
         put(Material.BEETROOT_SEEDS, false);
         put(Material.SNOW_BLOCK, false);
         put(Material.BEETROOT_SOUP, false);
@@ -546,32 +580,117 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         put(Material.ENCHANTED_GOLDEN_APPLE, false);
     }};
 
+    private static final HashMap<Material, Boolean> trialChambersLoot = new HashMap<>() {{
+        put(Material.EMERALD, false);
+        put(Material.ARROW, false);
+        put(Material.TIPPED_ARROW, false);
+        put(Material.IRON_INGOT, false);
+        put(Material.WIND_CHARGE, false);
+        put(Material.HONEY_BOTTLE, false);
+        put(Material.OMINOUS_BOTTLE, false);
+        put(Material.SHIELD, false);
+        put(Material.BOW, false);
+        put(Material.DIAMOND, false);
+        put(Material.GOLDEN_APPLE, false);
+        put(Material.GOLDEN_CARROT, false);
+        put(Material.ENCHANTED_BOOK, false);
+        put(Material.CROSSBOW, false);
+        put(Material.IRON_AXE, false);
+        put(Material.IRON_CHESTPLATE, false);
+        put(Material.BOLT_ARMOR_TRIM_SMITHING_TEMPLATE, false);
+        put(Material.MUSIC_DISC_PRECIPICE, false);
+        put(Material.GUSTER_BANNER_PATTERN, false);
+        put(Material.DIAMOND_AXE, false);
+        put(Material.DIAMOND_CHESTPLATE, false);
+        put(Material.TRIDENT, false);
+        put(Material.FLOW_ARMOR_TRIM_SMITHING_TEMPLATE, false);
+        put(Material.ENCHANTED_GOLDEN_APPLE, false);
+        put(Material.FLOW_BANNER_PATTERN, false);
+        put(Material.EMERALD_BLOCK, false);
+        put(Material.IRON_BLOCK, false);
+        put(Material.MUSIC_DISC_CREATOR, false);
+        put(Material.HEAVY_CORE, false);
+        put(Material.DIAMOND_BLOCK, false);
+        put(Material.HONEYCOMB, false);
+        put(Material.WOODEN_AXE, false);
+        put(Material.STICK, false);
+        put(Material.TRIAL_KEY, false);
+        put(Material.AMETHYST_SHARD, false);
+        put(Material.CAKE, false);
+        put(Material.DIAMOND_PICKAXE, false);
+        put(Material.GLOW_BERRIES, false);
+        put(Material.BAKED_POTATO, false);
+        put(Material.STONE_PICKAXE, false);
+        put(Material.TUFF, false);
+        put(Material.ACACIA_PLANKS, false);
+        put(Material.TORCH, false);
+        put(Material.BONE_MEAL, false);
+        put(Material.MOSS_BLOCK, false);
+        put(Material.MILK_BUCKET, false);
+        put(Material.BAMBOO_PLANKS, false);
+        put(Material.GOLDEN_AXE, false);
+        put(Material.GOLDEN_PICKAXE, false);
+        put(Material.BUCKET, false);
+        put(Material.COMPASS, false);
+        put(Material.SCAFFOLDING, false);
+        put(Material.BAMBOO_HANGING_SIGN, false);
+        put(Material.ENDER_PEARL, false);
+        put(Material.STONE_AXE, false);
+        put(Material.BREAD, false);
+        put(Material.COOKED_CHICKEN, false);
+        put(Material.OMINOUS_TRIAL_KEY, false);
+        put(Material.COOKED_BEEF, false);
+    }};
+
+    private static final HashMap<PotionType, Boolean> trialChambersArrowEffects = new HashMap<>() {{
+        put(PotionType.POISON, false);
+        put(PotionType.SLOWNESS, false);
+    }};
+
+    private static final HashMap<PotionType, Boolean> trialChambersPotions = new HashMap<>() {{
+       put(PotionType.REGENERATION, false);
+       put(PotionType.STRENGTH, false);
+       put(PotionType.SWIFTNESS, false);
+    }};
+
+    private static final HashMap<Material, Boolean> trialChambersEnchantedLoot = new HashMap<>() {{
+        put(Material.DIAMOND_AXE, false);
+    }};
+
     // Bastion Remnant left out because it's a special case. Add logic case handling in listener
     public static final HashMap<String, HashMap<Material, Boolean>> structureMaterials = new HashMap<>() {{
-        put("ancient_city", ancientCityLoot);
-        put("buried_treasure", buriedTreasureLoot);
-        put("desert_pyramid", desertPyramidLoot);
-        put("end_city", endCityLoot);
-        put("fortress", netherFortressLoot);
-        put("igloo", iglooLoot);
-        put("jungle_pyramid", junglePyramidLoot);
-        put("ocean_ruin", oceanRuinLoot);
-        put("pillager_outpost", pillagerOutpostLoot);
-        put("ruined_portal", ruinedPortalLoot);
-        put("shipwreck", shipwreckLoot);
-        put("stronghold", strongholdLoot);
-        put("mineshaft", mineshaftLoot);
-        put("village", villageLoot);
-        put("mansion", woodlandMansionLoot);
-        put("monster_room", monsterRoomLoot);
+        put(structures[0], ancientCityLoot);
+        put(structures[1], buriedTreasureLoot);
+        put(structures[2], desertPyramidLoot);
+        put(structures[3], endCityLoot);
+        put(structures[4], netherFortressLoot);
+        put(structures[5], iglooLoot);
+        put(structures[6], junglePyramidLoot);
+        put(structures[7], oceanRuinLoot);
+        put(structures[8], pillagerOutpostLoot);
+        put(structures[9], ruinedPortalLoot);
+        put(structures[10], shipwreckLoot);
+        put(structures[11], strongholdLoot);
+        put(structures[12], mineshaftLoot);
+        put(structures[13], villageLoot);
+        put(structures[14], woodlandMansionLoot);
+        put(structures[15], monsterRoomLoot);
     }};
+
+    public static String[] getStructures() {
+        return structures;
+    }
+
+    public static HashSet<Block> getPlacedBlocks() {
+        return placedBlocks;
+    }
 
     public static void setSelectedStructure(String selectedStructure) {
         AllAndOnlyChests.selectedStructure = selectedStructure;
     }
 
-    public static HashMap<String, Boolean> getStructures() {
-        return structures;
+    public static HashMap<String, Boolean> getStructureProgress() {
+        return structureProgress;
     }
 
     public static String getSelectedStructure() {
@@ -634,8 +753,8 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         return bastionRemnantLoot;
     }
 
-    public static HashMap<Material, Boolean> getBastionRemnantEnchanted() {
-        return bastionRemnantEnchanted;
+    public static HashMap<Material, Boolean> getBastionRemnantEnchantedLoot() {
+        return bastionRemnantEnchantedLoot;
     }
 
     public static HashMap<Material, Boolean> getBuriedTreasureLoot() {
@@ -704,7 +823,8 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
 //        RegisteredListener registeredListener = new RegisteredListener(this, (listener, event) -> onEvent(event), EventPriority.NORMAL, this, false);
 //        for (HandlerList handler : HandlerList.getHandlerLists())
 //            handler.register(registeredListener);
-        getServer().getPluginManager().registerEvents(new DropItemListener(), this);
+        plugin = this;
+        getServer().getPluginManager().registerEvents(new ItemListener(), this);
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
         getCommand("structures").setExecutor(new StructuresCommand());
     }
@@ -731,5 +851,9 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
     @Override
     public void onDisable() {
         // Plugin shutdown logic
+    }
+
+    public static Plugin getPlugin() {
+        return plugin;
     }
 }

@@ -63,7 +63,7 @@ public class StructureItemMenu extends Menu {
 
     @Override
     public String getMenuName() {
-        if (item.getItemMeta().getItemName().equals("bastion_remnant") || item.getItemMeta().getItemName().equals("mansion")) {
+        if (item.getItemMeta().getItemName().equals("bastion") || item.getItemMeta().getItemName().equals("woodland_mansion")) {
             String menuName = StructureItemUtility.formatString(item.getItemMeta().getItemName());
             return ChatColor.DARK_GRAY + menuName;
         }
@@ -170,7 +170,7 @@ public class StructureItemMenu extends Menu {
                     String itemName = item.getItemMeta().getItemName();
                     AllAndOnlyChests.setSelectedStructure(itemName);
                     player.closeInventory();
-                    if (!itemName.equals("bastion_remnant") && !itemName.equals("mansion")) {
+                    if (!itemName.equals("bastion") && !itemName.equals("mansion")) {
                         player.sendTitle(ChatColor.YELLOW + item.getItemMeta().getDisplayName(), ChatColor.YELLOW + "started!");
                     } else {
                         String title = StructureItemUtility.formatString(itemName);
@@ -212,7 +212,7 @@ public class StructureItemMenu extends Menu {
         inventory.setItem(3, greenGlass);
         inventory.setItem(5, greenGlass);
 
-        if (!item.getItemMeta().getItemName().equals("bastion_remnant")) {
+        if (!item.getItemMeta().getItemName().equals("bastion")) {
             for (HashMap.Entry<Material, Boolean> entry :
                     AllAndOnlyChests.structureMaterials.get(item.getItemMeta().getItemName()).entrySet()) {
                 if (!entry.getValue()) {
@@ -227,7 +227,7 @@ public class StructureItemMenu extends Menu {
                     items.add(buildItem(entry.getKey()));
                 }
             }
-            for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getBastionRemnantEnchanted().entrySet()) {
+            for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getBastionRemnantEnchantedLoot().entrySet()) {
                 if (!entry.getValue()) {
                     ItemStack itemStack = buildItem(entry.getKey());
                     ItemMeta itemMeta = itemStack.getItemMeta();

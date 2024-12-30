@@ -42,7 +42,7 @@ public class StructureMenu extends Menu {
 
     @Override
     public void setMenuItems() {
-        HashMap<String, Boolean> structures = AllAndOnlyChests.getStructures();
+        HashMap<String, Boolean> structures = AllAndOnlyChests.getStructureProgress();
         List<String> unfinishedStructures = new ArrayList<>();
         for (HashMap.Entry<String, Boolean> entry : structures.entrySet()) {
             if (!entry.getValue()) {
