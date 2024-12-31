@@ -7,7 +7,6 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.*;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -25,9 +24,9 @@ import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.potion.PotionType;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.HashSet;
 
@@ -113,49 +112,11 @@ public class ItemListener implements Listener {
         }
     }
 
-//    @EventHandler
-//    public void onInventoryOpen(InventoryOpenEvent e) {
-//        ItemStack itemStack = null;
-//        for (ItemStack item : e.getInventory().getStorageContents()) {
-//            ItemMeta itemMeta = item.getItemMeta();
-//            if (itemMeta != null && itemMeta.getItemName().equals(AllAndOnlyChests.getSelectedStructure())) {
-//                itemStack = item;
-//                break;
-//            }
-//        }
-//        if (itemStack != null) {
-//            e.getInventory().remove(itemStack);
-//        }
-//    }
-
-//    @EventHandler
-//    public void onInventoryOpen(InventoryOpenEvent e) {
-////        System.out.println(e.getInventory().getHolder() instanceof Lootable);
-////        if (e.getInventory().getHolder() != null &&
-////                !(e.getInventory().getHolder() instanceof Menu) &&
-////                (e.getInventory().getHolder() instanceof BlockState blockState && !AllAndOnlyChests.getPlacedBlocks().contains(blockState.getBlock())) &&
-////                (AllAndOnlyChests.getSelectedStructure().isEmpty() || (e.getInventory().getHolder() instanceof Lootable lootable && !lootable.getLootTable().getKey().toString().contains(AllAndOnlyChests.getSelectedStructure())))) {
-////            e.setCancelled(true);
-////        }
-//
-//
-//        InventoryHolder holder = e.getInventory().getHolder();
-//        if (holder != null) {
-//            if (holder instanceof Menu || (holder instanceof BlockState blockState && AllAndOnlyChests.getPlacedBlocks().contains(blockState.getBlock())) || (!AllAndOnlyChests.getSelectedStructure().isEmpty() && holder instanceof Lootable lootable && lootable.getLootTable().getKey().toString().contains(AllAndOnlyChests.getSelectedStructure()))) {
-//
-//            } else {
-//                e.setCancelled(true);
-//            }
-//        } else {
-//            e.setCancelled(true);
-//        }
-//    }
-
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent e) {
         InventoryHolder holder = e.getInventory().getHolder();
         if (holder != null) {
-            if (holder instanceof Menu || (holder instanceof BlockState blockState && AllAndOnlyChests.getPlacedBlocks().contains(blockState.getBlock())) || excludedInventories.contains(e.getInventory().getType()) || (lastOpened.containsKey((Player) e.getPlayer()) && lastOpened.get((Player) e.getPlayer()).equals(e.getInventory().getHolder()))) {
+            if (holder instanceof Menu || (holder instanceof BlockState blockState && AllAndOnlyChests.getPlacedBlocks().contains(blockState.getBlock())) || excludedInventories.contains(e.getInventory().getType()) || Arrays.stream(e.getInventory().getStorageContents()).noneMatch(i -> i != null && i.hasItemMeta() && Arrays.stream(AllAndOnlyChests.getStructures()).anyMatch(s -> s.equals(i.getItemMeta().getItemName())))) {
                 return;
             } else if (!AllAndOnlyChests.getSelectedStructure().isEmpty()) {
                 ItemStack structureItem = null;
@@ -168,14 +129,15 @@ public class ItemListener implements Listener {
                         }
                     }
                 }
-                if (structureItem != null && !AllAndOnlyChests.getSelectedStructure().equals("bastion")) {
+                if (structureItem != null && !AllAndOnlyChests.getSelectedStructure().equals("bastion") && !AllAndOnlyChests.getSelectedStructure().equals("trial_chambers")) {
                     if (lastOpened.containsKey((Player) e.getPlayer())) {
                         lastOpened.replace((Player) e.getPlayer(), e.getInventory().getHolder());
                     } else {
                         lastOpened.put((Player) e.getPlayer(), e.getInventory().getHolder());
                     }
                     e.getInventory().remove(structureItem);
-                    HashMap<Material, Boolean> structureMats = AllAndOnlyChests.getLoot(AllAndOnlyChests.getSelectedStructure());
+                    HashMap<Material, Boolean> structureMats =
+                            AllAndOnlyChests.getLoot(AllAndOnlyChests.getSelectedStructure());
                     ArrayList<String> newItems = new ArrayList<>();
                     for (ItemStack item : e.getInventory().getStorageContents()) {
                         if (item != null) {
@@ -197,7 +159,7 @@ public class ItemListener implements Listener {
                         boolean allMatch = structureMats.values().stream().allMatch(b -> b);
                         progressChallenge(newItems, allMatch);
                     }
-                } else if (structureItem != null) {
+                } else if (structureItem != null && AllAndOnlyChests.getSelectedStructure().equals("bastion")) {
                     if (lastOpened.containsKey((Player) e.getPlayer())) {
                         lastOpened.replace((Player) e.getPlayer(), e.getInventory().getHolder());
                     } else {
@@ -239,9 +201,12 @@ public class ItemListener implements Listener {
                         }
                     }
                     if (!newItems.isEmpty()) {
-                        boolean allMatch = bastionMats.values().stream().allMatch(b -> b) && bastionEnchantedMats.values().stream().allMatch(b -> b);
+                        boolean allMatch =
+                                bastionMats.values().stream().allMatch(b -> b) && bastionEnchantedMats.values().stream().allMatch(b -> b);
                         progressChallenge(newItems, allMatch);
                     }
+                } else if (structureItem != null) {
+
                 } else {
                     e.setCancelled(true);
                 }
@@ -287,10 +252,8 @@ public class ItemListener implements Listener {
 
     @EventHandler
     public void onDispenseLoot(BlockDispenseLootEvent e) {
-        Arrow arrow = (Arrow) e.getBlock();
         if (e.getBlock().getType() == Material.VAULT || e.getBlock().getType() == Material.TRIAL_SPAWNER) {
-            System.out.println("Blocking vault");
-            e.setCancelled(true);
+
         }
         System.out.println("Dispensed loot");
     }
@@ -298,7 +261,6 @@ public class ItemListener implements Listener {
     @EventHandler
     public void onLootGenerate(LootGenerateEvent e) {
         String key = e.getLootTable().getKey().toString();
-        System.out.println(key);
         for (String structure : AllAndOnlyChests.getStructures()) {
             if (key.contains(structure)) {
                 ItemStack dirt = new ItemStack(Material.DIRT);
@@ -310,46 +272,4 @@ public class ItemListener implements Listener {
             }
         }
     }
-
-//    @EventHandler
-//    public void onPlayerInteract(PlayerInteractEvent e) {
-//        System.out.println(e.getClickedBlock() instanceof InventoryHolder);
-//        System.out.println(e.getClickedBlock().getState());
-//    }
-
-//    @EventHandler
-//    public void onGenerateLoot(LootGenerateEvent e) {
-//        System.out.println("Generating Loot");
-////        if (e.getInventoryHolder() instanceof Lootable lootable && lootable instanceof Container) {
-////            LootTable lootTable = e.getLootTable();
-////            if (!AllAndOnlyChests.getSelectedStructure().isEmpty() && lootTable.getKey().toString().contains(AllAndOnlyChests.getSelectedStructure())) {
-////
-////            } else {
-////                System.out.println("Resetting loot");
-////                e.setCancelled(true);
-////                lootable.setLootTable(lootTable);
-////                ((Container) lootable).update();
-////            }
-////        }
-//        if (AllAndOnlyChests.getSelectedStructure().isEmpty() || !e.getLootTable().getKey().toString().contains(AllAndOnlyChests.getSelectedStructure())) {
-//            e.setCancelled(true);
-//            System.out.println("Resetting loot");
-//            LootTable lootTable = e.getLootTable();
-//            InventoryHolder holder = e.getInventoryHolder();
-//            if (holder instanceof Lootable) {
-//                System.out.println("First bracket");
-//                ((Lootable) holder).setLootTable(lootTable);
-//                if (holder instanceof Container) {
-//                    System.out.println("Second bracket");
-//                    ((Container) holder).update();
-//                }
-//            }
-//        }
-//        System.out.println(e.getLootTable().getKey());
-////        for (GeneratedStructure generatedStructure : e.getEntity().getLocation().getChunk().getStructures()) {
-////            System.out.println(generatedStructure.getStructure().equals(Structure.BURIED_TREASURE));
-////        }
-////        System.out.println(e.getLootTable().getKey().toString().contains("chest"));
-//    }
-
 }

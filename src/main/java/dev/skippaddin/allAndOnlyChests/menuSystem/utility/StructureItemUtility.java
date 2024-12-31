@@ -11,6 +11,7 @@ import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.potion.PotionType;
 
 import java.util.Arrays;
 import java.util.HashMap;
@@ -18,7 +19,8 @@ import java.util.List;
 
 public final class StructureItemUtility {
 
-    private StructureItemUtility() {}
+    private StructureItemUtility() {
+    }
 
     public static ItemStack getStructureItem(String structure) {
         switch (structure) {
@@ -42,7 +44,8 @@ public final class StructureItemUtility {
                             collected++;
                         }
                     }
-                    for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getBastionRemnantEnchantedLoot().entrySet()) {
+                    for (HashMap.Entry<Material, Boolean> entry :
+                            AllAndOnlyChests.getBastionRemnantEnchantedLoot().entrySet()) {
                         if (entry.getValue()) {
                             collected++;
                         }
@@ -153,22 +156,54 @@ public final class StructureItemUtility {
                 monsterRoomItemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
                 monsterRoomItem.setItemMeta(monsterRoomItemMeta);
                 return monsterRoomItem;
+            case "trial_chambers":
+                ItemStack trialChambersItem = new ItemStack(Material.VAULT);
+                ItemMeta trialChambersItemMeta = trialChambersItem.getItemMeta();
+                generateItemMeta(trialChambersItemMeta, structure, AllAndOnlyChests.getTrialChambersLoot());
+                int itemMaxCount = AllAndOnlyChests.getTrialChambersLoot().size() +
+                        AllAndOnlyChests.getTrialChambersEnchantedLoot().size() +
+                        AllAndOnlyChests.getTrialChambersPotions().size() +
+                        AllAndOnlyChests.getTrialChambersArrowEffects().size();
+                if (structure.equals(AllAndOnlyChests.getSelectedStructure())) {
+                    int collected = 0;
+                    for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getTrialChambersLoot().entrySet()) {
+                        if (entry.getValue()) {
+                            collected++;
+                        }
+                    }
+                    for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getTrialChambersEnchantedLoot().entrySet()) {
+                        if (entry.getValue()) {
+                            collected++;
+                        }
+                    }
+                    for (HashMap.Entry<PotionType, Boolean> entry : AllAndOnlyChests.getTrialChambersArrowEffects().entrySet()) {
+                        if (entry.getValue()) {
+                            collected++;
+                        }
+                    }
+                    for (HashMap.Entry<PotionType, Boolean> entry : AllAndOnlyChests.getTrialChambersPotions().entrySet()) {
+                        if (entry.getValue()) {
+                            collected++;
+                        }
+                    }
+                    trialChambersItemMeta.setLore(Arrays.asList(ChatColor.YELLOW + String.valueOf(collected) + "/" + itemMaxCount + " items"));
+                } else {
+                    trialChambersItemMeta.setLore(Arrays.asList(ChatColor.RED + String.valueOf(itemMaxCount) + " items"));
+                }
+                trialChambersItem.setItemMeta(trialChambersItemMeta);
+                return trialChambersItem;
             default:
                 return new ItemStack(Material.AIR);
         }
     }
 
     private static BannerMeta getBannerMeta(BannerMeta pillagerOutpostItemMeta) {
-        pillagerOutpostItemMeta.setPatterns(List.of(
-                new Pattern(DyeColor.CYAN, PatternType.RHOMBUS),
-                new Pattern(DyeColor.LIGHT_GRAY, PatternType.STRIPE_BOTTOM),
-                new Pattern(DyeColor.GRAY, PatternType.STRIPE_CENTER),
-                new Pattern(DyeColor.LIGHT_GRAY, PatternType.BORDER),
-                new Pattern(DyeColor.BLACK, PatternType.STRIPE_MIDDLE),
-                new Pattern(DyeColor.LIGHT_GRAY, PatternType.HALF_HORIZONTAL),
-                new Pattern(DyeColor.LIGHT_GRAY, PatternType.CIRCLE),
-                new Pattern(DyeColor.BLACK, PatternType.BORDER)
-        ));
+        pillagerOutpostItemMeta.setPatterns(List.of(new Pattern(DyeColor.CYAN, PatternType.RHOMBUS),
+                new Pattern(DyeColor.LIGHT_GRAY, PatternType.STRIPE_BOTTOM), new Pattern(DyeColor.GRAY,
+                        PatternType.STRIPE_CENTER), new Pattern(DyeColor.LIGHT_GRAY, PatternType.BORDER),
+                new Pattern(DyeColor.BLACK, PatternType.STRIPE_MIDDLE), new Pattern(DyeColor.LIGHT_GRAY,
+                        PatternType.HALF_HORIZONTAL), new Pattern(DyeColor.LIGHT_GRAY, PatternType.CIRCLE),
+                new Pattern(DyeColor.BLACK, PatternType.BORDER)));
         pillagerOutpostItemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
         return pillagerOutpostItemMeta;
     }

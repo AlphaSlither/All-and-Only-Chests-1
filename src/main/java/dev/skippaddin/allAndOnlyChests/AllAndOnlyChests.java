@@ -769,6 +769,22 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         return endCityLoot;
     }
 
+    public static HashMap<Material, Boolean> getTrialChambersLoot() {
+        return trialChambersLoot;
+    }
+
+    public static HashMap<Material, Boolean> getTrialChambersEnchantedLoot() {
+        return trialChambersEnchantedLoot;
+    }
+
+    public static HashMap<PotionType, Boolean> getTrialChambersArrowEffects() {
+        return trialChambersArrowEffects;
+    }
+
+    public static HashMap<PotionType, Boolean> getTrialChambersPotions() {
+        return trialChambersPotions;
+    }
+
     public static HashMap<Material, Boolean> getLoot(String structure) {
         return structureMaterials.get(structure);
     }
