@@ -14,6 +14,8 @@ import org.bukkit.event.inventory.InventoryClickEvent;
 import org.bukkit.inventory.ItemFlag;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionType;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -212,16 +214,7 @@ public class StructureItemMenu extends Menu {
         inventory.setItem(3, greenGlass);
         inventory.setItem(5, greenGlass);
 
-        if (!item.getItemMeta().getItemName().equals("bastion")) {
-            for (HashMap.Entry<Material, Boolean> entry :
-                    AllAndOnlyChests.structureMaterials.get(item.getItemMeta().getItemName()).entrySet()) {
-                if (!entry.getValue()) {
-                    items.add(buildItem(entry.getKey()));
-                }
-            }
-        } else {
-
-
+        if (item.getItemMeta().getItemName().equals("bastion")) {
             for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getBastionRemnantLoot().entrySet()) {
                 if (!entry.getValue()) {
                     items.add(buildItem(entry.getKey()));
@@ -229,24 +222,56 @@ public class StructureItemMenu extends Menu {
             }
             for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getBastionRemnantEnchantedLoot().entrySet()) {
                 if (!entry.getValue()) {
-                    ItemStack itemStack = buildItem(entry.getKey());
-                    ItemMeta itemMeta = itemStack.getItemMeta();
-                    itemMeta.addEnchant(Enchantment.EFFICIENCY, 1, false);
-                    itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
-                    itemStack.setItemMeta(itemMeta);
-                    items.add(itemStack);
+                    items.add(buildEnchantedItem(entry.getKey()));
                 }
             }
 
-            items.sort(new Comparator<ItemStack>() {
-                @Override
-                public int compare(ItemStack o1, ItemStack o2) {
-                    return o1.getType().toString().compareTo(o2.getType().toString());
+        } else if (item.getItemMeta().getItemName().equals("trial_chambers")) {
+            for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getTrialChambersLoot().entrySet()) {
+                if (!entry.getValue()) {
+                    items.add(buildItem(entry.getKey()));
                 }
-            });
+            }
+            for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getTrialChambersEnchantedLoot().entrySet()) {
+                if (!entry.getValue()) {
+                    items.add(buildEnchantedItem(entry.getKey()));
+                }
+            }
+            for (HashMap.Entry<PotionType, Boolean> entry : AllAndOnlyChests.getTrialChambersPotions().entrySet()) {
+                if (!entry.getValue()) {
+                    ItemStack potion = new ItemStack(Material.POTION);
+                    PotionMeta potionMeta = (PotionMeta) potion.getItemMeta();
+                    potionMeta.setBasePotionType(entry.getKey());
+                    potion.setItemMeta(potionMeta);
+                    items.add(potion);
+                }
+            }
+            for (HashMap.Entry<PotionType, Boolean> entry : AllAndOnlyChests.getTrialChambersArrowEffects().entrySet()) {
+                if (!entry.getValue()) {
+                    ItemStack tippedArrow = new ItemStack(Material.TIPPED_ARROW);
+                    PotionMeta tippedArrowMeta = (PotionMeta) tippedArrow.getItemMeta();
+                    tippedArrowMeta.setBasePotionType(entry.getKey());
+                    tippedArrow.setItemMeta(tippedArrowMeta);
+                    items.add(tippedArrow);
+                }
+            }
 
+        } else {
+            for (HashMap.Entry<Material, Boolean> entry :
+                    AllAndOnlyChests.structureMaterials.get(item.getItemMeta().getItemName()).entrySet()) {
+                if (!entry.getValue()) {
+                    items.add(buildItem(entry.getKey()));
+                }
+            }
         }
 
+
+        items.sort(new Comparator<ItemStack>() {
+            @Override
+            public int compare(ItemStack o1, ItemStack o2) {
+                return o1.getType().toString().compareTo(o2.getType().toString());
+            }
+        });
 
         if (items.size() > 40) {
             inventory.setItem(53, arrowDownItem);
@@ -274,6 +299,15 @@ public class StructureItemMenu extends Menu {
             }
 
         }
+    }
+
+    private ItemStack buildEnchantedItem(Material material) {
+        ItemStack itemStack = buildItem(material);
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        itemMeta.addEnchant(Enchantment.EFFICIENCY, 1, false);
+        itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
+        itemStack.setItemMeta(itemMeta);
+        return itemStack;
     }
 
     private ItemStack buildItem(Material material) {

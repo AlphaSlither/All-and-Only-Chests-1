@@ -583,7 +583,6 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
     private static final HashMap<Material, Boolean> trialChambersLoot = new HashMap<>() {{
         put(Material.EMERALD, false);
         put(Material.ARROW, false);
-        put(Material.TIPPED_ARROW, false);
         put(Material.IRON_INGOT, false);
         put(Material.WIND_CHARGE, false);
         put(Material.HONEY_BOTTLE, false);

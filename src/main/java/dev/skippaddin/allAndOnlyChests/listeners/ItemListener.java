@@ -7,6 +7,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.*;
+import org.bukkit.entity.Arrow;
 import org.bukkit.entity.ItemFrame;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -24,6 +25,9 @@ import org.bukkit.event.world.LootGenerateEvent;
 import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
+import org.bukkit.inventory.meta.PotionMeta;
+import org.bukkit.potion.PotionType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -32,8 +36,6 @@ import java.util.HashSet;
 
 //Contains all events a player can receive items from
 public class ItemListener implements Listener {
-
-    private final HashMap<Player, InventoryHolder> lastOpened = new HashMap<>();
 
     private final HashSet<InventoryType> excludedInventories = new HashSet<>() {{
         add(InventoryType.CREATIVE);
@@ -114,9 +116,12 @@ public class ItemListener implements Listener {
 
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent e) {
+
         InventoryHolder holder = e.getInventory().getHolder();
         if (holder != null) {
-            if (holder instanceof Menu || (holder instanceof BlockState blockState && AllAndOnlyChests.getPlacedBlocks().contains(blockState.getBlock())) || excludedInventories.contains(e.getInventory().getType()) || Arrays.stream(e.getInventory().getStorageContents()).noneMatch(i -> i != null && i.hasItemMeta() && Arrays.stream(AllAndOnlyChests.getStructures()).anyMatch(s -> s.equals(i.getItemMeta().getItemName())))) {
+            if (e.getInventory().getType() == InventoryType.MERCHANT || holder instanceof Dispenser && !AllAndOnlyChests.getPlacedBlocks().contains(((BlockState) holder).getBlock())) {
+                e.setCancelled(true);
+            } else if (holder instanceof Menu || (holder instanceof BlockState blockState && AllAndOnlyChests.getPlacedBlocks().contains(blockState.getBlock())) || excludedInventories.contains(e.getInventory().getType()) || Arrays.stream(e.getInventory().getStorageContents()).noneMatch(i -> i != null && i.hasItemMeta() && Arrays.stream(AllAndOnlyChests.getStructures()).anyMatch(s -> s.equals(i.getItemMeta().getItemName())))) {
                 return;
             } else if (!AllAndOnlyChests.getSelectedStructure().isEmpty()) {
                 ItemStack structureItem = null;
@@ -129,12 +134,7 @@ public class ItemListener implements Listener {
                         }
                     }
                 }
-                if (structureItem != null && !AllAndOnlyChests.getSelectedStructure().equals("bastion") && !AllAndOnlyChests.getSelectedStructure().equals("trial_chambers")) {
-                    if (lastOpened.containsKey((Player) e.getPlayer())) {
-                        lastOpened.replace((Player) e.getPlayer(), e.getInventory().getHolder());
-                    } else {
-                        lastOpened.put((Player) e.getPlayer(), e.getInventory().getHolder());
-                    }
+                 if (structureItem != null && !AllAndOnlyChests.getSelectedStructure().equals("bastion") && !AllAndOnlyChests.getSelectedStructure().equals("trial_chambers")) {
                     e.getInventory().remove(structureItem);
                     HashMap<Material, Boolean> structureMats =
                             AllAndOnlyChests.getLoot(AllAndOnlyChests.getSelectedStructure());
@@ -160,11 +160,6 @@ public class ItemListener implements Listener {
                         progressChallenge(newItems, allMatch);
                     }
                 } else if (structureItem != null && AllAndOnlyChests.getSelectedStructure().equals("bastion")) {
-                    if (lastOpened.containsKey((Player) e.getPlayer())) {
-                        lastOpened.replace((Player) e.getPlayer(), e.getInventory().getHolder());
-                    } else {
-                        lastOpened.put((Player) e.getPlayer(), e.getInventory().getHolder());
-                    }
                     e.getInventory().remove(structureItem);
                     HashMap<Material, Boolean> bastionMats = AllAndOnlyChests.getBastionRemnantLoot();
                     HashMap<Material, Boolean> bastionEnchantedMats = AllAndOnlyChests.getBastionRemnantEnchantedLoot();
@@ -185,6 +180,7 @@ public class ItemListener implements Listener {
                                     String displayName = displayNameBuilder.toString();
                                     newItems.add(displayName);
                                 }
+
                             } else {
                                 Boolean found = bastionMats.get(material);
                                 if (found != null && !found) {
@@ -205,8 +201,89 @@ public class ItemListener implements Listener {
                                 bastionMats.values().stream().allMatch(b -> b) && bastionEnchantedMats.values().stream().allMatch(b -> b);
                         progressChallenge(newItems, allMatch);
                     }
+                    if (!newItems.isEmpty()) {
+                        boolean allMatch =
+                                bastionMats.values().stream().allMatch(b -> b) && bastionEnchantedMats.values().stream().allMatch(b -> b);
+                        progressChallenge(newItems, allMatch);
+                    }
                 } else if (structureItem != null) {
+                    e.getInventory().remove(structureItem);
+                    HashMap<Material, Boolean> trialChambersLoot = AllAndOnlyChests.getTrialChambersLoot();
+                    HashMap<Material, Boolean> trialChambersEnchantedLoot =
+                            AllAndOnlyChests.getTrialChambersEnchantedLoot();
+                    HashMap<PotionType, Boolean> trialChambersArrows = AllAndOnlyChests.getTrialChambersArrowEffects();
+                    HashMap<PotionType, Boolean> trialChambersPotions = AllAndOnlyChests.getTrialChambersPotions();
+                    ArrayList<String> newItems = new ArrayList<>();
 
+                    for (ItemStack item : e.getInventory().getStorageContents()) {
+                        if (item != null) {
+                            Material material = item.getType();
+                            if (material == Material.POTION) {
+                                PotionMeta potionMeta = (PotionMeta) item.getItemMeta();
+                                PotionType potionType = potionMeta.getBasePotionType();
+                                String[] splitTypes = potionType.toString().split("_");
+                                if (splitTypes.length == 1) {
+                                    potionType = PotionType.valueOf(splitTypes[0]);
+                                } else {
+                                    potionType = PotionType.valueOf(splitTypes[1]);
+                                }
+                                Boolean found = trialChambersPotions.get(potionType);
+                                if (found != null && !found) {
+                                    trialChambersPotions.replace(potionType, true);
+                                    String type = potionType.toString();
+                                    String displayName =
+                                            "Potion of " + type.charAt(0) + type.substring(1).toLowerCase();
+                                    newItems.add(displayName);
+                                }
+                            } else if (material == Material.TIPPED_ARROW) {
+                                PotionMeta arrowMeta = (PotionMeta) item.getItemMeta();
+                                PotionType arrowType = arrowMeta.getBasePotionType();
+                                String[] splitTypes = arrowType.toString().split("_");
+                                if (splitTypes.length == 1) {
+                                    arrowType = PotionType.valueOf(splitTypes[0]);
+                                } else {
+                                    arrowType = PotionType.valueOf(splitTypes[1]);
+                                }
+                                Boolean found = trialChambersArrows.get(arrowType);
+                                if (found != null && !found) {
+                                    trialChambersArrows.replace(arrowType, true);
+                                    String type = arrowType.toString();
+                                    String displayName = "Arrow of " + type.charAt(0) + type.substring(1).toLowerCase();
+                                    newItems.add(displayName);
+                                }
+                            } else if (!item.getEnchantments().isEmpty() && AllAndOnlyChests.getTrialChambersEnchantedLoot().containsKey(material)) {
+                                Boolean found = trialChambersEnchantedLoot.get(material);
+                                if (!found) {
+                                    trialChambersEnchantedLoot.replace(material, true);
+                                    String[] words = material.toString().split("_");
+                                    StringBuilder displayNameBuilder = new StringBuilder();
+                                    for (String word : words) {
+                                        displayNameBuilder.append(word.charAt(0)).append(word.substring(1).toLowerCase()).append(" ");
+                                    }
+                                    displayNameBuilder.append("enchanted");
+                                    String displayName = displayNameBuilder.toString();
+                                    newItems.add(displayName);
+                                }
+                            } else {
+                                Boolean found = trialChambersLoot.get(material);
+                                if (found != null && !found) {
+                                    trialChambersLoot.replace(material, true);
+                                    String[] words = material.toString().split("_");
+                                    StringBuilder displayNameBuilder = new StringBuilder();
+                                    for (String word : words) {
+                                        displayNameBuilder.append(word.charAt(0)).append(word.substring(1).toLowerCase()).append(" ");
+                                    }
+                                    String displayName = displayNameBuilder.toString().strip();
+                                    newItems.add(displayName);
+                                }
+                            }
+                        }
+                    }
+                    if (!newItems.isEmpty()) {
+                        boolean allMatch =
+                                trialChambersLoot.values().stream().allMatch(b -> b) && trialChambersEnchantedLoot.values().stream().allMatch(b -> b) && trialChambersArrows.values().stream().allMatch(b -> b) && trialChambersPotions.values().stream().allMatch(b -> b);
+                        progressChallenge(newItems, allMatch);
+                    }
                 } else {
                     e.setCancelled(true);
                 }
@@ -247,28 +324,53 @@ public class ItemListener implements Listener {
 
     @EventHandler
     public void onDispense(BlockDispenseEvent e) {
-        System.out.println("BlockDispenseEvent triggered");
+
     }
 
     @EventHandler
     public void onDispenseLoot(BlockDispenseLootEvent e) {
-        if (e.getBlock().getType() == Material.VAULT || e.getBlock().getType() == Material.TRIAL_SPAWNER) {
-
-        }
-        System.out.println("Dispensed loot");
+//        if (e.getBlock().getType() == Material.VAULT || e.getBlock().getType() == Material.TRIAL_SPAWNER) {
+//            if (AllAndOnlyChests.getSelectedStructure().equals("trial_chambers")) {
+//                ArrayList<String> items = new ArrayList<>();
+//                for (ItemStack itemStack : e.getDispensedLoot()) {
+//                    items.add(itemStack.toString());
+//                }
+//
+//                new BukkitRunnable() {
+//
+//                    int index = 0;
+//
+//                    @Override
+//                    public void run() {
+//                        for (Player player : Bukkit.getOnlinePlayers()) {
+//                            player.sendMessage(items.get(index));
+//                        }
+//                        index++;
+//                        if (index == items.size()) {
+//                            this.cancel();
+//                        }
+//                    }
+//                }.runTaskTimer(AllAndOnlyChests.getPlugin(), 30, 20);
+//            } else {
+//                e.setCancelled(true);
+//            }
+//        }
     }
 
     @EventHandler
     public void onLootGenerate(LootGenerateEvent e) {
-        String key = e.getLootTable().getKey().toString();
-        for (String structure : AllAndOnlyChests.getStructures()) {
-            if (key.contains(structure)) {
-                ItemStack dirt = new ItemStack(Material.DIRT);
-                ItemMeta dirtMeta = dirt.getItemMeta();
-                dirtMeta.setItemName(structure);
-                dirt.setItemMeta(dirtMeta);
-                e.getLoot().add(dirt);
-                break;
+        if (!(e.getInventoryHolder() instanceof Dispenser)) {
+            String key = e.getLootTable().getKey().toString();
+            for (String structure : AllAndOnlyChests.getStructures()) {
+                if (key.contains(structure)) {
+                    System.out.println("Contains structure");
+                    ItemStack dirt = new ItemStack(Material.DIRT);
+                    ItemMeta dirtMeta = dirt.getItemMeta();
+                    dirtMeta.setItemName(structure);
+                    dirt.setItemMeta(dirtMeta);
+                    e.getLoot().add(dirt);
+                    break;
+                }
             }
         }
     }
