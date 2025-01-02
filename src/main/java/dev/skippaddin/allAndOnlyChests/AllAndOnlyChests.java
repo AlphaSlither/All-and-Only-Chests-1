@@ -1,21 +1,18 @@
 package dev.skippaddin.allAndOnlyChests;
 
 import dev.skippaddin.allAndOnlyChests.commands.StructuresCommand;
-import dev.skippaddin.allAndOnlyChests.listeners.ItemListener;
+import dev.skippaddin.allAndOnlyChests.listeners.ItemDropListener;
 import dev.skippaddin.allAndOnlyChests.listeners.MenuListener;
+import dev.skippaddin.allAndOnlyChests.listeners.StructureLootListener;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.PlayerMenuUtility;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.entity.Arrow;
 import org.bukkit.entity.Player;
-import org.bukkit.entity.TippedArrow;
 import org.bukkit.event.*;
 import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
-import org.bukkit.potion.PotionEffectType;
 import org.bukkit.potion.PotionType;
 
-import java.lang.reflect.Array;
 import java.util.*;
 
 
@@ -839,7 +836,8 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
 //        for (HandlerList handler : HandlerList.getHandlerLists())
 //            handler.register(registeredListener);
         plugin = this;
-        getServer().getPluginManager().registerEvents(new ItemListener(), this);
+        getServer().getPluginManager().registerEvents(new StructureLootListener(), this);
+        getServer().getPluginManager().registerEvents(new ItemDropListener(), this);
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
         getCommand("structures").setExecutor(new StructuresCommand());
     }
