@@ -38,6 +38,7 @@ public class StructureLootListener implements Listener {
         add(InventoryType.CARTOGRAPHY);
         add(InventoryType.SMOKER);
         add(InventoryType.LECTERN);
+        add(InventoryType.ENDER_CHEST);
     }};
 
     @EventHandler
@@ -45,7 +46,7 @@ public class StructureLootListener implements Listener {
 
         InventoryHolder holder = e.getInventory().getHolder();
         if (holder != null) {
-            if (e.getInventory().getType() == InventoryType.MERCHANT || holder instanceof Dispenser && !AllAndOnlyChests.getPlacedBlocks().contains(((BlockState) holder).getBlock())) {
+            if (e.getInventory().getType() == InventoryType.MERCHANT || (holder instanceof Dispenser && !AllAndOnlyChests.getPlacedBlocks().contains(((BlockState) holder).getBlock())) || (e.getInventory().getType() == InventoryType.BREWING && !AllAndOnlyChests.getPlacedBlocks().contains(((BlockState) holder).getBlock()))) {
                 e.setCancelled(true);
             } else if (holder instanceof Menu || (holder instanceof BlockState blockState && AllAndOnlyChests.getPlacedBlocks().contains(blockState.getBlock())) || allowedInventories.contains(e.getInventory().getType()) || Arrays.stream(e.getInventory().getStorageContents()).noneMatch(i -> i != null && i.hasItemMeta() && Arrays.stream(AllAndOnlyChests.getStructures()).anyMatch(s -> s.equals(i.getItemMeta().getItemName())))) {
                 return;
@@ -182,7 +183,6 @@ public class StructureLootListener implements Listener {
             String key = e.getLootTable().getKey().toString();
             for (String structure : AllAndOnlyChests.getStructures()) {
                 if (key.contains(structure)) {
-                    System.out.println("Contains structure");
                     ItemStack dirt = new ItemStack(Material.DIRT);
                     ItemMeta dirtMeta = dirt.getItemMeta();
                     dirtMeta.setItemName(structure);

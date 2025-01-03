@@ -11,7 +11,7 @@ public class StructuresCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String s, String[] args) {
-        if (sender instanceof Player p && p.hasPermission("AllAndOnlyChest.structures")) {
+        if (sender instanceof Player p && p.hasPermission("AllAndOnlyChests.command.structures")) {
             new StructureMenu(AllAndOnlyChests.getPlayerMenuUtility(p)).open();
         }
         return true;

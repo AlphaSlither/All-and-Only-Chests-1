@@ -1,9 +1,8 @@
 package dev.skippaddin.allAndOnlyChests;
 
+import dev.skippaddin.allAndOnlyChests.commands.StructureCommand;
 import dev.skippaddin.allAndOnlyChests.commands.StructuresCommand;
-import dev.skippaddin.allAndOnlyChests.listeners.ItemDropListener;
-import dev.skippaddin.allAndOnlyChests.listeners.MenuListener;
-import dev.skippaddin.allAndOnlyChests.listeners.StructureLootListener;
+import dev.skippaddin.allAndOnlyChests.listeners.*;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.PlayerMenuUtility;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
@@ -828,6 +827,10 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         playerMenuUtilityMap.remove(p);
     }
 
+    public static Plugin getPlugin() {
+        return plugin;
+    }
+
     @Override
     public void onEnable() {
         // Plugin startup logic
@@ -836,10 +839,13 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
 //        for (HandlerList handler : HandlerList.getHandlerLists())
 //            handler.register(registeredListener);
         plugin = this;
+        getServer().getPluginManager().registerEvents(new PlayerQuitListener(), this);
         getServer().getPluginManager().registerEvents(new StructureLootListener(), this);
         getServer().getPluginManager().registerEvents(new ItemDropListener(), this);
         getServer().getPluginManager().registerEvents(new MenuListener(), this);
+        getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
         getCommand("structures").setExecutor(new StructuresCommand());
+        getCommand("structure").setExecutor(new StructureCommand());
     }
 
 //    @EventHandler
@@ -866,7 +872,4 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         // Plugin shutdown logic
     }
 
-    public static Plugin getPlugin() {
-        return plugin;
-    }
 }

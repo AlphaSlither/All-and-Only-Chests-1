@@ -5,6 +5,7 @@ import dev.skippaddin.allAndOnlyChests.menuSystem.Menu;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.CustomHeadUtility;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.PlayerMenuUtility;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.StructureItemUtility;
+import dev.skippaddin.allAndOnlyChests.scoreboard.StructureScoreboard;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -172,13 +173,15 @@ public class StructureItemMenu extends Menu {
                     String itemName = item.getItemMeta().getItemName();
                     AllAndOnlyChests.setSelectedStructure(itemName);
                     player.closeInventory();
-                    if (!itemName.equals("bastion") && !itemName.equals("mansion")) {
+                    if (!itemName.equals("bastion") && !itemName.equals("woodland_mansion")) {
                         player.sendTitle(ChatColor.YELLOW + item.getItemMeta().getDisplayName(), ChatColor.YELLOW + "started!");
                     } else {
                         String title = StructureItemUtility.formatString(itemName);
                         player.sendTitle(ChatColor.YELLOW + title, ChatColor.YELLOW + "started!");
                     }
                     player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
+                    StructureScoreboard scoreboard = StructureScoreboard.getInstance();
+                    scoreboard.updateStructure(item.getItemMeta().getDisplayName(), items.size());
                 }
             }
         }

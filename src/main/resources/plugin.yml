@@ -5,5 +5,10 @@ api-version: '1.21'
 commands:
   structures:
     description: Shows all unfinished and finished structures. Select your structure here.
-    permissions: AllAndOnlyChest.structures
+    permissions: AllAndOnlyChests.command.structures
     default: op
+  structure:
+    description: Commands related to a single structure
+    permissions:
+      AllAndOnlyChests.command.finish:
+        description: "Completes the current selected structure."

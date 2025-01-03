@@ -1,5 +1,6 @@
 package dev.skippaddin.allAndOnlyChests.listeners;
 
+import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import dev.skippaddin.allAndOnlyChests.AllAndOnlyChests;
 import org.bukkit.Material;
 import org.bukkit.block.*;
@@ -7,21 +8,29 @@ import org.bukkit.entity.ItemFrame;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
-import org.bukkit.event.entity.EntityDamageByEntityEvent;
-import org.bukkit.event.entity.EntityDeathEvent;
-import org.bukkit.event.entity.EntityDropItemEvent;
-import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.entity.*;
 import org.bukkit.event.hanging.HangingBreakEvent;
 import org.bukkit.event.player.PlayerFishEvent;
+import org.bukkit.event.player.PlayerInteractEvent;
+
+import java.util.HashSet;
 
 //Contains all events a player can receive items from
 public class ItemDropListener implements Listener {
+
 
     //Prevents getting items from item frame
     @EventHandler
     public void onItemFrameDamage(EntityDamageByEntityEvent e) {
         if (e.getEntity() instanceof ItemFrame) {
             e.setCancelled(true);
+        }
+    }
+
+    @EventHandler
+    public void onDestroyBlock(BlockDestroyEvent e) {
+        if (!AllAndOnlyChests.getPlacedBlocks().remove(e.getBlock())) {
+            e.setWillDrop(false);
         }
     }
 
@@ -33,12 +42,6 @@ public class ItemDropListener implements Listener {
     @EventHandler
     public void onBlockBreak(BlockBreakEvent e) {
         Block block = e.getBlock();
-        if (block.getType() == Material.FARMLAND) {
-            Block relative = block.getRelative(0, 1, 0);
-            if (relative.getType() != Material.AIR && relative.getType() != Material.CAVE_AIR && relative.getType() != Material.VOID_AIR && !AllAndOnlyChests.getPlacedBlocks().remove(relative)) {
-                relative.setType(Material.AIR);
-            }
-        }
         if (!AllAndOnlyChests.getPlacedBlocks().remove(block)) {
             block.setType(Material.AIR);
         }
@@ -83,7 +86,9 @@ public class ItemDropListener implements Listener {
 
     @EventHandler
     public void onCrafterCraftItem(CrafterCraftEvent e) {
-        e.setCancelled(true);
+        if (!AllAndOnlyChests.getPlacedBlocks().contains(e.getBlock())) {
+            e.setCancelled(true);
+        }
     }
 
     @EventHandler
@@ -92,8 +97,13 @@ public class ItemDropListener implements Listener {
     }
 
     @EventHandler
-    public void onDispense(BlockDispenseEvent e) {
-
+    public void onPlayerInteract(PlayerInteractEvent e) {
+        if (e.getAction() == Action.RIGHT_CLICK_BLOCK) {
+            Block block = e.getClickedBlock();
+            if (block != null && block.getType() == Material.CHISELED_BOOKSHELF && !AllAndOnlyChests.getPlacedBlocks().contains(block)) {
+                e.setCancelled(true);
+            }
+        }
     }
 
 

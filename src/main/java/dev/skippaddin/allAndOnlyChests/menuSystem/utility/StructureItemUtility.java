@@ -1,7 +1,8 @@
 package dev.skippaddin.allAndOnlyChests.menuSystem.utility;
 
 import dev.skippaddin.allAndOnlyChests.AllAndOnlyChests;
-import org.bukkit.ChatColor;
+import net.kyori.adventure.text.Component;
+import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.DyeColor;
 import org.bukkit.Material;
 import org.bukkit.block.banner.Pattern;
@@ -13,7 +14,6 @@ import org.bukkit.inventory.meta.BannerMeta;
 import org.bukkit.inventory.meta.ItemMeta;
 import org.bukkit.potion.PotionType;
 
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 
@@ -50,12 +50,12 @@ public final class StructureItemUtility {
                             collected++;
                         }
                     }
-                    bastionRemnantItemMeta.setLore(Arrays.asList(ChatColor.YELLOW + String.valueOf(collected) + "/" + maxCount + " items"));
+                    bastionRemnantItemMeta.lore(List.of(Component.text(collected + "/" + maxCount + " items", NamedTextColor.YELLOW)));
                 } else {
-                    bastionRemnantItemMeta.setLore(Arrays.asList(ChatColor.RED + String.valueOf(maxCount) + " items"));
+                    bastionRemnantItemMeta.lore(List.of(Component.text(maxCount + " items", NamedTextColor.RED)));
                     String displayName = formatString(structure);
                     // Minecraft sets Color to Yellow automatically for piglin head
-                    bastionRemnantItemMeta.setDisplayName(ChatColor.WHITE + displayName);
+                    bastionRemnantItemMeta.displayName(Component.text(displayName, NamedTextColor.WHITE));
                 }
                 bastionRemnantItem.setItemMeta(bastionRemnantItemMeta);
                 return bastionRemnantItem;
@@ -63,7 +63,6 @@ public final class StructureItemUtility {
                 ItemStack buriedTreasureItem = new ItemStack(Material.IRON_SHOVEL);
                 ItemMeta buriedTreasureItemMeta = buriedTreasureItem.getItemMeta();
                 generateItemMeta(buriedTreasureItemMeta, structure, AllAndOnlyChests.getBuriedTreasureLoot());
-                buriedTreasureItemMeta.addItemFlags(ItemFlag.HIDE_ATTRIBUTES);
                 buriedTreasureItem.setItemMeta(buriedTreasureItemMeta);
                 return buriedTreasureItem;
             case "desert_pyramid":
@@ -82,6 +81,11 @@ public final class StructureItemUtility {
                 ItemStack fortressItem = new ItemStack(Material.BLAZE_ROD);
                 ItemMeta fortressItemMeta = fortressItem.getItemMeta();
                 generateItemMeta(fortressItemMeta, structure, AllAndOnlyChests.getNetherFortressLoot());
+                if (AllAndOnlyChests.getSelectedStructure().equals(structure)) {
+                    fortressItemMeta.displayName(Component.text("Fortress", NamedTextColor.YELLOW));
+                } else {
+                    fortressItemMeta.displayName(Component.text("Fortress"));
+                }
                 fortressItem.setItemMeta(fortressItemMeta);
                 return fortressItem;
             case "igloo":
@@ -100,6 +104,11 @@ public final class StructureItemUtility {
                 ItemStack oceanRuinItem = new ItemStack(Material.POLISHED_GRANITE);
                 ItemMeta oceanRuinItemMeta = oceanRuinItem.getItemMeta();
                 generateItemMeta(oceanRuinItemMeta, structure, AllAndOnlyChests.getOceanRuinLoot());
+                if (AllAndOnlyChests.getSelectedStructure().equals(structure)) {
+                    oceanRuinItemMeta.displayName(Component.text("Ocean Ruin", NamedTextColor.YELLOW));
+                } else {
+                    oceanRuinItemMeta.displayName(Component.text("Ocean Ruin"));
+                }
                 oceanRuinItem.setItemMeta(oceanRuinItemMeta);
                 return oceanRuinItem;
             case "pillager_outpost":
@@ -145,7 +154,7 @@ public final class StructureItemUtility {
                 generateItemMeta(mansionItemMeta, structure, AllAndOnlyChests.getWoodlandMansionLoot());
                 if (!AllAndOnlyChests.getSelectedStructure().equals(structure)) {
                     String displayName = formatString(structure);
-                    mansionItemMeta.setDisplayName(ChatColor.WHITE + displayName);
+                    mansionItemMeta.customName(Component.text(displayName, NamedTextColor.WHITE));
                 }
                 mansionItem.setItemMeta(mansionItemMeta);
                 return mansionItem;
@@ -154,6 +163,11 @@ public final class StructureItemUtility {
                 ItemMeta monsterRoomItemMeta = monsterRoomItem.getItemMeta();
                 generateItemMeta(monsterRoomItemMeta, structure, AllAndOnlyChests.getMonsterRoomLoot());
                 monsterRoomItemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
+                if (AllAndOnlyChests.getSelectedStructure().equals(structure)) {
+                    monsterRoomItemMeta.displayName(Component.text("Monster Room", NamedTextColor.YELLOW));
+                } else {
+                    monsterRoomItemMeta.displayName(Component.text("Monster Room"));
+                }
                 monsterRoomItem.setItemMeta(monsterRoomItemMeta);
                 return monsterRoomItem;
             case "trial_chambers":
@@ -186,9 +200,9 @@ public final class StructureItemUtility {
                             collected++;
                         }
                     }
-                    trialChambersItemMeta.setLore(Arrays.asList(ChatColor.YELLOW + String.valueOf(collected) + "/" + itemMaxCount + " items"));
+                    trialChambersItemMeta.lore(List.of(Component.text(collected + "/" + itemMaxCount + " items", NamedTextColor.YELLOW)));
                 } else {
-                    trialChambersItemMeta.setLore(Arrays.asList(ChatColor.RED + String.valueOf(itemMaxCount) + " items"));
+                    trialChambersItemMeta.lore(List.of(Component.text(itemMaxCount + " items", NamedTextColor.RED)));
                 }
                 trialChambersItem.setItemMeta(trialChambersItemMeta);
                 return trialChambersItem;
@@ -210,11 +224,11 @@ public final class StructureItemUtility {
 
 
     private static void generateItemMeta(ItemMeta itemMeta, String structure, HashMap<Material, Boolean> loot) {
-        itemMeta.setItemName(structure);
+        itemMeta.itemName(Component.text(structure));
         String displayName = formatString(structure);
         int maxCount = loot.size();
         if (structure.equals(AllAndOnlyChests.getSelectedStructure())) {
-            itemMeta.setDisplayName(ChatColor.YELLOW + displayName);
+            itemMeta.customName(Component.text(displayName, NamedTextColor.YELLOW));
             itemMeta.addEnchant(Enchantment.BREACH, 1, true);
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             int collected = 0;
@@ -223,10 +237,10 @@ public final class StructureItemUtility {
                     collected++;
                 }
             }
-            itemMeta.setLore(Arrays.asList(ChatColor.YELLOW + String.valueOf(collected) + "/" + maxCount + " items"));
+            itemMeta.lore(List.of(Component.text(collected + "/" + maxCount + " items", NamedTextColor.YELLOW)));
         } else {
-            itemMeta.setDisplayName(displayName);
-            itemMeta.setLore(Arrays.asList(ChatColor.RED + String.valueOf(maxCount) + " items"));
+            itemMeta.displayName(Component.text(displayName));
+            itemMeta.lore(List.of(Component.text(maxCount + " items", NamedTextColor.RED)));
         }
     }
 
@@ -234,9 +248,9 @@ public final class StructureItemUtility {
     public static String formatString(String name) {
         String[] words = name.split("_");
         StringBuilder displayName = new StringBuilder();
-        displayName.append(Character.toUpperCase(words[0].charAt(0)) + words[0].substring(1));
+        displayName.append(Character.toUpperCase(words[0].charAt(0))).append(words[0].substring(1));
         for (int i = 1; i < words.length; i++) {
-            displayName.append(" ").append(Character.toUpperCase(words[i].charAt(0)) + words[i].substring(1));
+            displayName.append(" ").append(Character.toUpperCase(words[i].charAt(0))).append(words[i].substring(1));
         }
 
         return displayName.toString();
