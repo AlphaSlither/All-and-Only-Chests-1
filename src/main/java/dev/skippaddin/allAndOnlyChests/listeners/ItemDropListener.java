@@ -31,6 +31,8 @@ public class ItemDropListener implements Listener {
     public void onDestroyBlock(BlockDestroyEvent e) {
         if (!AllAndOnlyChests.getPlacedBlocks().remove(e.getBlock())) {
             e.setWillDrop(false);
+        } else {
+            AllAndOnlyChests.setSaved(false);
         }
     }
 
@@ -44,12 +46,15 @@ public class ItemDropListener implements Listener {
         Block block = e.getBlock();
         if (!AllAndOnlyChests.getPlacedBlocks().remove(block)) {
             block.setType(Material.AIR);
+        } else {
+            AllAndOnlyChests.setSaved(false);
         }
     }
 
     @EventHandler
     public void onBlockPlace(BlockPlaceEvent e) {
         AllAndOnlyChests.getPlacedBlocks().add(e.getBlockPlaced());
+        AllAndOnlyChests.setSaved(false);
     }
 
     @EventHandler

@@ -63,75 +63,78 @@ public class StructureLootListener implements Listener {
                         }
                     }
                 }
-                if (structureItem != null && !AllAndOnlyChests.getSelectedStructure().equals("bastion") && !AllAndOnlyChests.getSelectedStructure().equals("trial_chambers")) {
-                    e.getInventory().remove(structureItem);
-                    HashMap<Material, Boolean> structureMats = AllAndOnlyChests.getLoot(AllAndOnlyChests.getSelectedStructure());
-                    ArrayList<Component> newItems = new ArrayList<>();
-                    for (ItemStack item : e.getInventory().getStorageContents()) {
-                        if (item != null) {
-                            Material material = item.getType();
-                            Boolean found = structureMats.get(material);
-                            if (found != null && !found) {
-                                structureMats.replace(material, true);
-                                newItems.add(item.displayName());
-                            }
-                        }
-                    }
-                    if (!newItems.isEmpty()) {
-                        boolean allMatch = structureMats.values().stream().allMatch(b -> b);
-                        progressChallenge(newItems, allMatch);
-                    }
-                } else if (structureItem != null && AllAndOnlyChests.getSelectedStructure().equals("bastion")) {
-                    e.getInventory().remove(structureItem);
-                    HashMap<Material, Boolean> bastionMats = AllAndOnlyChests.getBastionRemnantLoot();
-                    HashMap<Material, Boolean> bastionEnchantedMats = AllAndOnlyChests.getBastionRemnantEnchantedLoot();
-                    ArrayList<Component> newItems = new ArrayList<>();
-                    for (ItemStack item : e.getInventory().getStorageContents()) {
-                        if (item != null) {
-                            Material material = item.getType();
-                            if (bastionEnchantedMats.containsKey(material) && !item.getEnchantments().isEmpty()) {
-                                Boolean found = bastionEnchantedMats.get(material);
-                                if (!found) {
-                                    bastionEnchantedMats.replace(material, true);
-                                    newItems.add(item.displayName());
-                                }
-
-                            } else {
-                                Boolean found = bastionMats.get(material);
+                if (structureItem != null) {
+                    if (!AllAndOnlyChests.getSelectedStructure().equals("bastion") && !AllAndOnlyChests.getSelectedStructure().equals("trial_chambers")) {
+                        e.getInventory().remove(structureItem);
+                        HashMap<Material, Boolean> structureMats =
+                                AllAndOnlyChests.getLoot(AllAndOnlyChests.getSelectedStructure());
+                        ArrayList<Component> newItems = new ArrayList<>();
+                        for (ItemStack item : e.getInventory().getStorageContents()) {
+                            if (item != null) {
+                                Material material = item.getType();
+                                Boolean found = structureMats.get(material);
                                 if (found != null && !found) {
-                                    bastionMats.replace(material, true);
+                                    structureMats.replace(material, true);
                                     newItems.add(item.displayName());
                                 }
                             }
                         }
-                    }
-                    if (!newItems.isEmpty()) {
-                        boolean allMatch =
-                                bastionMats.values().stream().allMatch(b -> b) && bastionEnchantedMats.values().stream().allMatch(b -> b);
-                        progressChallenge(newItems, allMatch);
-                    }
-                    if (!newItems.isEmpty()) {
-                        boolean allMatch =
-                                bastionMats.values().stream().allMatch(b -> b) && bastionEnchantedMats.values().stream().allMatch(b -> b);
-                        progressChallenge(newItems, allMatch);
-                    }
-                    //Trial chambers
-                } else if (structureItem != null) {
+                        if (!newItems.isEmpty()) {
+                            boolean allMatch = structureMats.values().stream().allMatch(b -> b);
+                            progressChallenge(newItems, allMatch);
+                        }
+                    } else if (AllAndOnlyChests.getSelectedStructure().equals("bastion")) {
+                        e.getInventory().remove(structureItem);
+                        HashMap<Material, Boolean> bastionMats = AllAndOnlyChests.getBastionRemnantLoot();
+                        HashMap<Material, Boolean> bastionEnchantedMats =
+                                AllAndOnlyChests.getBastionRemnantEnchantedLoot();
+                        ArrayList<Component> newItems = new ArrayList<>();
+                        for (ItemStack item : e.getInventory().getStorageContents()) {
+                            if (item != null) {
+                                Material material = item.getType();
+                                if (bastionEnchantedMats.containsKey(material) && !item.getEnchantments().isEmpty()) {
+                                    Boolean found = bastionEnchantedMats.get(material);
+                                    if (!found) {
+                                        bastionEnchantedMats.replace(material, true);
+                                        newItems.add(item.displayName());
+                                    }
 
-                    e.getInventory().remove(structureItem);
-                    HashMap<Material, Boolean> trialChambersLoot = AllAndOnlyChests.getTrialChambersLoot();
-                    HashMap<Material, Boolean> trialChambersEnchantedLoot = AllAndOnlyChests.getTrialChambersEnchantedLoot();
-                    HashMap<PotionType, Boolean> trialChambersArrows = AllAndOnlyChests.getTrialChambersArrowEffects();
-                    HashMap<PotionType, Boolean> trialChambersPotions = AllAndOnlyChests.getTrialChambersPotions();
-                    ArrayList<Component> newItems = new ArrayList<>();
+                                } else {
+                                    Boolean found = bastionMats.get(material);
+                                    if (found != null && !found) {
+                                        bastionMats.replace(material, true);
+                                        newItems.add(item.displayName());
+                                    }
+                                }
+                            }
+                        }
+                        if (!newItems.isEmpty()) {
+                            boolean allMatch =
+                                    bastionMats.values().stream().allMatch(b -> b) && bastionEnchantedMats.values().stream().allMatch(b -> b);
+                            progressChallenge(newItems, allMatch);
+                        }
+                        //Trial chambers
+                    } else {
 
-                    processTrialChambersLoot(e.getInventory().getStorageContents(), newItems, trialChambersLoot, trialChambersEnchantedLoot, trialChambersArrows, trialChambersPotions);
+                        e.getInventory().remove(structureItem);
+                        HashMap<Material, Boolean> trialChambersLoot = AllAndOnlyChests.getTrialChambersLoot();
+                        HashMap<Material, Boolean> trialChambersEnchantedLoot =
+                                AllAndOnlyChests.getTrialChambersEnchantedLoot();
+                        HashMap<PotionType, Boolean> trialChambersArrows =
+                                AllAndOnlyChests.getTrialChambersArrowEffects();
+                        HashMap<PotionType, Boolean> trialChambersPotions = AllAndOnlyChests.getTrialChambersPotions();
+                        ArrayList<Component> newItems = new ArrayList<>();
 
-                    if (!newItems.isEmpty()) {
-                        boolean allMatch =
-                                trialChambersLoot.values().stream().allMatch(b -> b) && trialChambersEnchantedLoot.values().stream().allMatch(b -> b) && trialChambersArrows.values().stream().allMatch(b -> b) && trialChambersPotions.values().stream().allMatch(b -> b);
-                        progressChallenge(newItems, allMatch);
+                        processTrialChambersLoot(e.getInventory().getStorageContents(), newItems, trialChambersLoot,
+                                trialChambersEnchantedLoot, trialChambersArrows, trialChambersPotions);
+
+                        if (!newItems.isEmpty()) {
+                            boolean allMatch =
+                                    trialChambersLoot.values().stream().allMatch(b -> b) && trialChambersEnchantedLoot.values().stream().allMatch(b -> b) && trialChambersArrows.values().stream().allMatch(b -> b) && trialChambersPotions.values().stream().allMatch(b -> b);
+                            progressChallenge(newItems, allMatch);
+                        }
                     }
+                    AllAndOnlyChests.setSaved(false);
                 } else {
                     e.setCancelled(true);
                 }
@@ -185,7 +188,8 @@ public class StructureLootListener implements Listener {
         if (e.getBlock().getType() == Material.VAULT || e.getBlock().getType() == Material.TRIAL_SPAWNER) {
             if (AllAndOnlyChests.getSelectedStructure().equals("trial_chambers")) {
                 HashMap<Material, Boolean> trialChambersLoot = AllAndOnlyChests.getTrialChambersLoot();
-                HashMap<Material, Boolean> trialChambersEnchantedLoot = AllAndOnlyChests.getTrialChambersEnchantedLoot();
+                HashMap<Material, Boolean> trialChambersEnchantedLoot =
+                        AllAndOnlyChests.getTrialChambersEnchantedLoot();
                 HashMap<PotionType, Boolean> trialChambersArrows = AllAndOnlyChests.getTrialChambersArrowEffects();
                 HashMap<PotionType, Boolean> trialChambersPotions = AllAndOnlyChests.getTrialChambersPotions();
                 ArrayList<Component> newItems = new ArrayList<>();
@@ -194,7 +198,8 @@ public class StructureLootListener implements Listener {
                 ItemStack[] items = new ItemStack[itemsList.size()];
                 itemsList.toArray(items);
 
-                processTrialChambersLoot(items, newItems, trialChambersLoot, trialChambersEnchantedLoot, trialChambersArrows, trialChambersPotions);
+                processTrialChambersLoot(items, newItems, trialChambersLoot, trialChambersEnchantedLoot,
+                        trialChambersArrows, trialChambersPotions);
 
                 for (Player player : Bukkit.getOnlinePlayers()) {
                     player.sendMessage(ChatColor.GRAY + "Found new items:");
@@ -203,7 +208,8 @@ public class StructureLootListener implements Listener {
                 boolean allMatch = false;
 
                 if (!newItems.isEmpty()) {
-                    allMatch = trialChambersLoot.values().stream().allMatch(b -> b) && trialChambersEnchantedLoot.values().stream().allMatch(b -> b) && trialChambersArrows.values().stream().allMatch(b -> b) && trialChambersPotions.values().stream().allMatch(b -> b);
+                    allMatch =
+                            trialChambersLoot.values().stream().allMatch(b -> b) && trialChambersEnchantedLoot.values().stream().allMatch(b -> b) && trialChambersArrows.values().stream().allMatch(b -> b) && trialChambersPotions.values().stream().allMatch(b -> b);
                     if (allMatch) {
                         AllAndOnlyChests.getStructureProgress().replace(AllAndOnlyChests.getSelectedStructure(), true);
                         AllAndOnlyChests.setSelectedStructure("");
@@ -213,6 +219,8 @@ public class StructureLootListener implements Listener {
                 boolean finalAllMatch = allMatch;
                 StructureScoreboard scoreboard = StructureScoreboard.getInstance();
                 scoreboard.updateChests();
+
+                AllAndOnlyChests.setSaved(false);
 
                 new BukkitRunnable() {
 
@@ -252,7 +260,9 @@ public class StructureLootListener implements Listener {
         }
     }
 
-    private void processTrialChambersLoot(ItemStack[] items, ArrayList<Component> newItems, HashMap<Material, Boolean> trialChambersLoot, HashMap<Material, Boolean> trialChambersEnchantedLoot, HashMap<PotionType, Boolean> trialChambersArrows, HashMap<PotionType, Boolean> trialChambersPotions) {
+    private void processTrialChambersLoot(ItemStack[] items, ArrayList<Component> newItems, HashMap<Material,
+            Boolean> trialChambersLoot, HashMap<Material, Boolean> trialChambersEnchantedLoot, HashMap<PotionType,
+            Boolean> trialChambersArrows, HashMap<PotionType, Boolean> trialChambersPotions) {
 
         for (ItemStack item : items) {
             if (item != null) {

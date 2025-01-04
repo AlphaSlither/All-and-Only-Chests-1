@@ -1,13 +1,11 @@
 package dev.skippaddin.allAndOnlyChests;
 
-import dev.skippaddin.allAndOnlyChests.commands.StructureCommand;
-import dev.skippaddin.allAndOnlyChests.commands.StructuresCommand;
+import dev.skippaddin.allAndOnlyChests.commands.*;
 import dev.skippaddin.allAndOnlyChests.listeners.*;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.PlayerMenuUtility;
 import dev.skippaddin.allAndOnlyChests.scoreboard.StructureScoreboard;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.World;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
@@ -20,7 +18,9 @@ import java.util.*;
 
 public final class AllAndOnlyChests extends JavaPlugin implements Listener {
 
-    private static Plugin plugin;
+    private static AllAndOnlyChests plugin;
+
+    private static boolean saved = false;
 
     private static final HashSet<Block> placedBlocks = new HashSet<>();
 
@@ -675,6 +675,14 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         put(structures[15], monsterRoomLoot);
     }};
 
+    public static boolean getSaved() {
+        return saved;
+    }
+
+    public static void setSaved(boolean b) {
+        saved = b;
+    }
+
     public static String[] getStructures() {
         return structures;
     }
@@ -830,7 +838,7 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         playerMenuUtilityMap.remove(p);
     }
 
-    public static Plugin getPlugin() {
+    public static AllAndOnlyChests getPlugin() {
         return plugin;
     }
 
@@ -849,6 +857,10 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         getServer().getPluginManager().registerEvents(new PlayerJoinListener(), this);
         getCommand("structures").setExecutor(new StructuresCommand());
         getCommand("structure").setExecutor(new StructureCommand());
+        getCommand("structure").setTabCompleter(new StructureTabCompleter());
+        getCommand("scoreboard").setExecutor(new ScoreboardCommand());
+        getCommand("scoreboard").setTabCompleter(new ScoreboardTabCompleter());
+        getCommand("save").setExecutor(new SaveCommand());
     }
 
     @Override
@@ -858,76 +870,83 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
     }
 
     public void saveData() {
-        getLogger().info("Saving data...");
-        getConfig().set("selectedStructure", selectedStructure);
+        if (!saved) {
+            getLogger().info("Saving data...");
+            getConfig().set("selectedStructure", selectedStructure);
 
-        List<String> structures = new ArrayList<>();
-        for (HashMap.Entry<String, Boolean> entry : structureProgress.entrySet()) {
-            if (entry.getValue()) {
-                structures.add(entry.getKey());
-            }
-        }
-        getConfig().set("completedStructures", structures);
-
-        List<String> collectedItems = new ArrayList<>();
-        List<String> collectedEnchantedItems = new ArrayList<>();
-        List<String> collectedPotions = new ArrayList<>();
-        List<String> collectedArrows = new ArrayList<>();
-        if (!selectedStructure.isEmpty()) {
-            if (selectedStructure.equals("bastion")) {
-                for (HashMap.Entry<Material, Boolean> entry : bastionRemnantLoot.entrySet()) {
-                    if (entry.getValue()) {
-                        collectedItems.add(entry.getKey().toString());
-                    }
-                }
-                for (HashMap.Entry<Material, Boolean> entry : bastionRemnantEnchantedLoot.entrySet()) {
-                    if (entry.getValue()) {
-                        collectedEnchantedItems.add(entry.getKey().toString());
-                    }
-                }
-            } else if (selectedStructure.equals("trial_chambers")) {
-                for (HashMap.Entry<Material, Boolean> entry : trialChambersLoot.entrySet()) {
-                    if (entry.getValue()) {
-                        collectedItems.add(entry.getKey().toString());
-                    }
-                }
-                for (HashMap.Entry<Material, Boolean> entry : trialChambersEnchantedLoot.entrySet()) {
-                    if (entry.getValue()) {
-                        collectedEnchantedItems.add(entry.getKey().toString());
-                    }
-                }
-                for (HashMap.Entry<PotionType, Boolean> entry : trialChambersArrowEffects.entrySet()) {
-                    if (entry.getValue()) {
-                        collectedArrows.add(entry.getKey().toString());
-                    }
-                }
-                for (HashMap.Entry<PotionType, Boolean> entry : trialChambersPotions.entrySet()) {
-                    if (entry.getValue()) {
-                        collectedPotions.add(entry.getKey().toString());
-                    }
-                }
-            } else {
-                for (HashMap.Entry<Material, Boolean> entry : structureMaterials.get(selectedStructure).entrySet()) {
-                    if (entry.getValue()) {
-                        collectedItems.add(entry.getKey().toString());
-                    }
+            List<String> structures = new ArrayList<>();
+            for (HashMap.Entry<String, Boolean> entry : structureProgress.entrySet()) {
+                if (entry.getValue()) {
+                    structures.add(entry.getKey());
                 }
             }
-        }
+            getConfig().set("completedStructures", structures);
 
-        List<Map<String, Object>> serializedLocations = new ArrayList<>();
-        for (Block block : placedBlocks) {
-            serializedLocations.add(block.getLocation().serialize()); // Serialize each location
-        }
+            List<String> collectedItems = new ArrayList<>();
+            List<String> collectedEnchantedItems = new ArrayList<>();
+            List<String> collectedPotions = new ArrayList<>();
+            List<String> collectedArrows = new ArrayList<>();
+            if (!selectedStructure.isEmpty()) {
+                if (selectedStructure.equals("bastion")) {
+                    for (HashMap.Entry<Material, Boolean> entry : bastionRemnantLoot.entrySet()) {
+                        if (entry.getValue()) {
+                            collectedItems.add(entry.getKey().toString());
+                        }
+                    }
+                    for (HashMap.Entry<Material, Boolean> entry : bastionRemnantEnchantedLoot.entrySet()) {
+                        if (entry.getValue()) {
+                            collectedEnchantedItems.add(entry.getKey().toString());
+                        }
+                    }
+                } else if (selectedStructure.equals("trial_chambers")) {
+                    for (HashMap.Entry<Material, Boolean> entry : trialChambersLoot.entrySet()) {
+                        if (entry.getValue()) {
+                            collectedItems.add(entry.getKey().toString());
+                        }
+                    }
+                    for (HashMap.Entry<Material, Boolean> entry : trialChambersEnchantedLoot.entrySet()) {
+                        if (entry.getValue()) {
+                            collectedEnchantedItems.add(entry.getKey().toString());
+                        }
+                    }
+                    for (HashMap.Entry<PotionType, Boolean> entry : trialChambersArrowEffects.entrySet()) {
+                        if (entry.getValue()) {
+                            collectedArrows.add(entry.getKey().toString());
+                        }
+                    }
+                    for (HashMap.Entry<PotionType, Boolean> entry : trialChambersPotions.entrySet()) {
+                        if (entry.getValue()) {
+                            collectedPotions.add(entry.getKey().toString());
+                        }
+                    }
+                } else {
+                    for (HashMap.Entry<Material, Boolean> entry : structureMaterials.get(selectedStructure).entrySet()) {
+                        if (entry.getValue()) {
+                            collectedItems.add(entry.getKey().toString());
+                        }
+                    }
+                }
+            }
 
-        getConfig().set("collectedItems", collectedItems);
-        getConfig().set("collectedEnchantedItems", collectedEnchantedItems);
-        getConfig().set("collectedPotions", collectedPotions);
-        getConfig().set("collectedArrows", collectedArrows);
-        StructureScoreboard scoreboard = StructureScoreboard.getInstance();
-        scoreboard.stageSaveData();
-        getConfig().set("placedBlocks", serializedLocations);
-        saveConfig();
+            List<Map<String, Object>> serializedLocations = new ArrayList<>();
+            for (Block block : placedBlocks) {
+                serializedLocations.add(block.getLocation().serialize()); // Serialize each location
+            }
+
+            getConfig().set("collectedItems", collectedItems);
+            getConfig().set("collectedEnchantedItems", collectedEnchantedItems);
+            getConfig().set("collectedPotions", collectedPotions);
+            getConfig().set("collectedArrows", collectedArrows);
+            StructureScoreboard scoreboard = StructureScoreboard.getInstance();
+            scoreboard.stageSaveData();
+            getConfig().set("placedBlocks", serializedLocations);
+            saveConfig();
+
+            saved = true;
+            getLogger().info("Data saved");
+        } else {
+            getLogger().info("Data already saved after recent changes");
+        }
     }
 
     private void loadData() {

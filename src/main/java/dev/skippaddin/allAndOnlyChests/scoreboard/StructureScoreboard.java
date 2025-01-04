@@ -62,6 +62,16 @@ public class StructureScoreboard {
         player.setScoreboard(scoreboard);
     }
 
+    public void toggleScoreboard(Player player) {
+        if (player.getScoreboard() == scoreboard) {
+            ScoreboardManager manager = Bukkit.getScoreboardManager();
+            Scoreboard newScoreboard = manager.getNewScoreboard();
+            player.setScoreboard(newScoreboard);
+        } else {
+            player.setScoreboard(scoreboard);
+        }
+    }
+
     public void updateStructure(String structure, int max) {
         scoreboard.clearSlot(DisplaySlot.SIDEBAR);
 

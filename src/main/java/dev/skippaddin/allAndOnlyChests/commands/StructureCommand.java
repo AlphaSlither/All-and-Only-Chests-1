@@ -20,7 +20,7 @@ public class StructureCommand implements CommandExecutor {
         if (sender instanceof Player p) {
             if (args.length == 1) {
                 if (args[0].equalsIgnoreCase("finish")) {
-                    if (p.hasPermission("AllAndOnlyChests.command.finish")) {
+                    if (p.hasPermission("AllAndOnlyChests.command.structure.finish")) {
                         if (!AllAndOnlyChests.getSelectedStructure().isEmpty()) {
                             AllAndOnlyChests.getStructureProgress().replace(AllAndOnlyChests.getSelectedStructure(), true);
                             AllAndOnlyChests.setSelectedStructure("");
@@ -29,6 +29,7 @@ public class StructureCommand implements CommandExecutor {
                             p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f);
                             StructureScoreboard scoreboard = StructureScoreboard.getInstance();
                             scoreboard.complete();
+                            AllAndOnlyChests.setSaved(false);
                         } else {
                             TextComponent textComponent = Component.text("No structure selected!", NamedTextColor.RED);
                             p.sendMessage(textComponent);

@@ -168,7 +168,7 @@ public class StructureItemMenu extends Menu {
                 }
 
             } else if (e.getSlot() == 4) {
-                if (AllAndOnlyChests.getSelectedStructure().isEmpty()) {
+                if (AllAndOnlyChests.getSelectedStructure().isEmpty() && !AllAndOnlyChests.getStructureProgress().get(item.getItemMeta().getItemName())) {
                     Player player = playerMenuUtility.getOwner();
                     String itemName = item.getItemMeta().getItemName();
                     AllAndOnlyChests.setSelectedStructure(itemName);
