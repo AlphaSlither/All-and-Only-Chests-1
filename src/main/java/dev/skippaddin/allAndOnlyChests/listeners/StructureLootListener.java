@@ -2,6 +2,8 @@ package dev.skippaddin.allAndOnlyChests.listeners;
 
 import dev.skippaddin.allAndOnlyChests.AllAndOnlyChests;
 import dev.skippaddin.allAndOnlyChests.menuSystem.Menu;
+import dev.skippaddin.allAndOnlyChests.scoreboard.StructureScoreboard;
+import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
@@ -64,20 +66,14 @@ public class StructureLootListener implements Listener {
                 if (structureItem != null && !AllAndOnlyChests.getSelectedStructure().equals("bastion") && !AllAndOnlyChests.getSelectedStructure().equals("trial_chambers")) {
                     e.getInventory().remove(structureItem);
                     HashMap<Material, Boolean> structureMats = AllAndOnlyChests.getLoot(AllAndOnlyChests.getSelectedStructure());
-                    ArrayList<String> newItems = new ArrayList<>();
+                    ArrayList<Component> newItems = new ArrayList<>();
                     for (ItemStack item : e.getInventory().getStorageContents()) {
                         if (item != null) {
                             Material material = item.getType();
                             Boolean found = structureMats.get(material);
                             if (found != null && !found) {
                                 structureMats.replace(material, true);
-                                String[] words = material.toString().split("_");
-                                StringBuilder displayNameBuilder = new StringBuilder();
-                                for (String word : words) {
-                                    displayNameBuilder.append(word.charAt(0)).append(word.substring(1).toLowerCase()).append(" ");
-                                }
-                                String displayName = displayNameBuilder.toString().strip();
-                                newItems.add(displayName);
+                                newItems.add(item.displayName());
                             }
                         }
                     }
@@ -89,7 +85,7 @@ public class StructureLootListener implements Listener {
                     e.getInventory().remove(structureItem);
                     HashMap<Material, Boolean> bastionMats = AllAndOnlyChests.getBastionRemnantLoot();
                     HashMap<Material, Boolean> bastionEnchantedMats = AllAndOnlyChests.getBastionRemnantEnchantedLoot();
-                    ArrayList<String> newItems = new ArrayList<>();
+                    ArrayList<Component> newItems = new ArrayList<>();
                     for (ItemStack item : e.getInventory().getStorageContents()) {
                         if (item != null) {
                             Material material = item.getType();
@@ -97,27 +93,14 @@ public class StructureLootListener implements Listener {
                                 Boolean found = bastionEnchantedMats.get(material);
                                 if (!found) {
                                     bastionEnchantedMats.replace(material, true);
-                                    String[] words = material.toString().split("_");
-                                    StringBuilder displayNameBuilder = new StringBuilder();
-                                    for (String word : words) {
-                                        displayNameBuilder.append(word.charAt(0)).append(word.substring(1).toLowerCase()).append(" ");
-                                    }
-                                    displayNameBuilder.append("enchanted");
-                                    String displayName = displayNameBuilder.toString();
-                                    newItems.add(displayName);
+                                    newItems.add(item.displayName());
                                 }
 
                             } else {
                                 Boolean found = bastionMats.get(material);
                                 if (found != null && !found) {
                                     bastionMats.replace(material, true);
-                                    String[] words = material.toString().split("_");
-                                    StringBuilder displayNameBuilder = new StringBuilder();
-                                    for (String word : words) {
-                                        displayNameBuilder.append(word.charAt(0)).append(word.substring(1).toLowerCase()).append(" ");
-                                    }
-                                    String displayName = displayNameBuilder.toString().strip();
-                                    newItems.add(displayName);
+                                    newItems.add(item.displayName());
                                 }
                             }
                         }
@@ -140,7 +123,7 @@ public class StructureLootListener implements Listener {
                     HashMap<Material, Boolean> trialChambersEnchantedLoot = AllAndOnlyChests.getTrialChambersEnchantedLoot();
                     HashMap<PotionType, Boolean> trialChambersArrows = AllAndOnlyChests.getTrialChambersArrowEffects();
                     HashMap<PotionType, Boolean> trialChambersPotions = AllAndOnlyChests.getTrialChambersPotions();
-                    ArrayList<String> newItems = new ArrayList<>();
+                    ArrayList<Component> newItems = new ArrayList<>();
 
                     processTrialChambersLoot(e.getInventory().getStorageContents(), newItems, trialChambersLoot, trialChambersEnchantedLoot, trialChambersArrows, trialChambersPotions);
 
@@ -158,15 +141,15 @@ public class StructureLootListener implements Listener {
         }
     }
 
-    private void progressChallenge(ArrayList<String> items, boolean allMatch) {
+    private void progressChallenge(ArrayList<Component> items, boolean allMatch) {
         if (allMatch) {
             AllAndOnlyChests.getStructureProgress().replace(AllAndOnlyChests.getSelectedStructure(), true);
             AllAndOnlyChests.setSelectedStructure("");
         }
         for (Player player : Bukkit.getOnlinePlayers()) {
             player.sendMessage(ChatColor.GRAY + "Found " + items.size() + " new items:");
-            for (String item : items) {
-                player.sendMessage(" [" + item + "]");
+            for (Component item : items) {
+                player.sendMessage(Component.text(" ").append(item));
             }
             if (allMatch) {
                 player.sendMessage(ChatColor.GOLD + "Completed structure!");
@@ -175,6 +158,9 @@ public class StructureLootListener implements Listener {
                 player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
             }
         }
+        StructureScoreboard scoreboard = StructureScoreboard.getInstance();
+        scoreboard.updateItems(items.size());
+        scoreboard.updateChests();
     }
 
     @EventHandler
@@ -202,7 +188,7 @@ public class StructureLootListener implements Listener {
                 HashMap<Material, Boolean> trialChambersEnchantedLoot = AllAndOnlyChests.getTrialChambersEnchantedLoot();
                 HashMap<PotionType, Boolean> trialChambersArrows = AllAndOnlyChests.getTrialChambersArrowEffects();
                 HashMap<PotionType, Boolean> trialChambersPotions = AllAndOnlyChests.getTrialChambersPotions();
-                ArrayList<String> newItems = new ArrayList<>();
+                ArrayList<Component> newItems = new ArrayList<>();
 
                 List<ItemStack> itemsList = e.getDispensedLoot();
                 ItemStack[] items = new ItemStack[itemsList.size()];
@@ -225,6 +211,8 @@ public class StructureLootListener implements Listener {
                 }
 
                 boolean finalAllMatch = allMatch;
+                StructureScoreboard scoreboard = StructureScoreboard.getInstance();
+                scoreboard.updateChests();
 
                 new BukkitRunnable() {
 
@@ -239,8 +227,8 @@ public class StructureLootListener implements Listener {
                                 }
                             } else {
                                 for (Player player : Bukkit.getOnlinePlayers()) {
-                                    for (String item : newItems) {
-                                        player.sendMessage(" [" + item + "]");
+                                    for (Component item : newItems) {
+                                        player.sendMessage(Component.text(" ").append(item));
                                     }
                                     if (finalAllMatch) {
                                         player.sendMessage(ChatColor.GOLD + "Completed structure");
@@ -249,6 +237,7 @@ public class StructureLootListener implements Listener {
                                         player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
                                     }
                                 }
+                                scoreboard.updateItems(newItems.size());
                             }
                             this.cancel();
                         }
@@ -263,7 +252,7 @@ public class StructureLootListener implements Listener {
         }
     }
 
-    private void processTrialChambersLoot(ItemStack[] items, ArrayList<String> newItems, HashMap<Material, Boolean> trialChambersLoot, HashMap<Material, Boolean> trialChambersEnchantedLoot, HashMap<PotionType, Boolean> trialChambersArrows, HashMap<PotionType, Boolean> trialChambersPotions) {
+    private void processTrialChambersLoot(ItemStack[] items, ArrayList<Component> newItems, HashMap<Material, Boolean> trialChambersLoot, HashMap<Material, Boolean> trialChambersEnchantedLoot, HashMap<PotionType, Boolean> trialChambersArrows, HashMap<PotionType, Boolean> trialChambersPotions) {
 
         for (ItemStack item : items) {
             if (item != null) {
@@ -280,10 +269,7 @@ public class StructureLootListener implements Listener {
                     Boolean found = trialChambersPotions.get(potionType);
                     if (found != null && !found) {
                         trialChambersPotions.replace(potionType, true);
-                        String type = potionType.toString();
-                        String displayName =
-                                "Potion of " + type.charAt(0) + type.substring(1).toLowerCase();
-                        newItems.add(displayName);
+                        newItems.add(item.displayName());
                     }
                 } else if (material == Material.TIPPED_ARROW) {
                     PotionMeta arrowMeta = (PotionMeta) item.getItemMeta();
@@ -297,38 +283,22 @@ public class StructureLootListener implements Listener {
                     Boolean found = trialChambersArrows.get(arrowType);
                     if (found != null && !found) {
                         trialChambersArrows.replace(arrowType, true);
-                        String type = arrowType.toString();
-                        String displayName = "Arrow of " + type.charAt(0) + type.substring(1).toLowerCase();
-                        newItems.add(displayName);
+                        newItems.add(item.displayName());
                     }
                 } else if (!item.getEnchantments().isEmpty() && AllAndOnlyChests.getTrialChambersEnchantedLoot().containsKey(material)) {
                     Boolean found = trialChambersEnchantedLoot.get(material);
                     if (!found) {
                         trialChambersEnchantedLoot.replace(material, true);
-                        String[] words = material.toString().split("_");
-                        StringBuilder displayNameBuilder = new StringBuilder();
-                        for (String word : words) {
-                            displayNameBuilder.append(word.charAt(0)).append(word.substring(1).toLowerCase()).append(" ");
-                        }
-                        displayNameBuilder.append("enchanted");
-                        String displayName = displayNameBuilder.toString();
-                        newItems.add(displayName);
+                        newItems.add(item.displayName());
                     }
                 } else {
                     Boolean found = trialChambersLoot.get(material);
                     if (found != null && !found) {
                         trialChambersLoot.replace(material, true);
-                        String[] words = material.toString().split("_");
-                        StringBuilder displayNameBuilder = new StringBuilder();
-                        for (String word : words) {
-                            displayNameBuilder.append(word.charAt(0)).append(word.substring(1).toLowerCase()).append(" ");
-                        }
-                        String displayName = displayNameBuilder.toString().strip();
-                        newItems.add(displayName);
+                        newItems.add(item.displayName());
                     }
                 }
             }
         }
     }
-
 }

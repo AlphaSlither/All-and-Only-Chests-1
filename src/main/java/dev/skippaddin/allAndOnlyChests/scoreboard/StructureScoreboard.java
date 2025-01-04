@@ -5,6 +5,7 @@ import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import net.md_5.bungee.api.ChatColor;
 import org.bukkit.Bukkit;
+import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.entity.Player;
 import org.bukkit.scoreboard.*;
 
@@ -22,7 +23,7 @@ public class StructureScoreboard {
     private int max;
 
     private StructureScoreboard() {
-        String structure = AllAndOnlyChests.getPlugin().getConfig().getString("ScoreboardStructure");
+        String structure = AllAndOnlyChests.getPlugin().getConfig().getString("scoreboardStructure");
         if (structure != null) {
             this.structure = structure;
         } else {
@@ -44,7 +45,7 @@ public class StructureScoreboard {
 
         objective.getScore(ChatColor.YELLOW + "Items: " + ChatColor.WHITE + collected + "/" + max).setScore(2);
         objective.getScore(ChatColor.YELLOW + "Chests: " + ChatColor.WHITE + chests).setScore(1);
-        if (max != 0 && max != collected) {
+        if (max != 0 && max == collected) {
             objective.getScore(ChatColor.GOLD + "COMPLETED!").setScore(0);
         }
     }
@@ -77,19 +78,34 @@ public class StructureScoreboard {
         objective.getScore(ChatColor.YELLOW + "Chests: " + ChatColor.WHITE + chests).setScore(1);
     }
 
-    public void updateScore(int collected) {
+    public void updateItems(int collected) {
         Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
         objective.getScore(ChatColor.YELLOW + "Items: " + ChatColor.WHITE + this.collected + "/" + this.max).resetScore();
         this.collected += collected;
         objective.getScore(ChatColor.YELLOW + "Items: " + ChatColor.WHITE + this.collected + "/" + max).setScore(2);
 
-        objective.getScore(ChatColor.YELLOW + "Chests: " + ChatColor.WHITE + this.chests).resetScore();
-        this.chests++;
-        objective.getScore(ChatColor.YELLOW + "Chests: " + ChatColor.WHITE + this.chests).setScore(1);
-
-        if (this.max == this.collected) {
+        if (this.collected >= this.max) {
             objective.getScore(ChatColor.GOLD + "COMPLETED!").setScore(0);
         }
     }
 
+    public void updateChests() {
+        Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
+        objective.getScore(ChatColor.YELLOW + "Chests: " + ChatColor.WHITE + this.chests).resetScore();
+        this.chests++;
+        objective.getScore(ChatColor.YELLOW + "Chests: " + ChatColor.WHITE + this.chests).setScore(1);
+    }
+
+    public void complete() {
+        Objective objective = scoreboard.getObjective(DisplaySlot.SIDEBAR);
+        objective.getScore(ChatColor.GOLD + "COMPLETED!").setScore(0);
+    }
+
+    public void stageSaveData() {
+        FileConfiguration configuration = AllAndOnlyChests.getPlugin().getConfig();
+        configuration.set("scoreboardStructure", structure);
+        configuration.set("chests", chests);
+        configuration.set("collected", collected);
+        configuration.set("max", max);
+    }
 }

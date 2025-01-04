@@ -1,0 +1,37 @@
+# Here is all the data for the plugin saved. 
+# Please don't change anything. It could break the plugin if you don't know what you are doing.
+# To reset the data delete this file.
+
+# The currently selected structure.
+selectedStructure: ''
+
+# All structures you have already completed. Structures are named after their LootTable keys.
+completedStructures: []
+
+# All collected items of the current structure.
+collectedItems: []
+
+# Some items have enchanted and not enchanted versions in certain structures. 
+# The enchanted version is listed here if you have found them.
+collectedEnchantedItems: []
+
+# The collected type of potion you have found in the trial chambers
+collectedPotions: []
+
+# The collected type of arrow you have found in the trial chambers
+collectedArrows: []
+
+# The structure to be displayed in the scoreboard. Different than selectedStructure, because of differences in internal naming
+scoreboardStructure: None
+
+# The current number of chests you have tried to open for the current structure
+chests: 0
+
+# The number of items you have collected for the current structure
+collected: 0
+
+# The maximum amount of items available in the current structure
+max: 0
+
+# The blocks placed by the player
+placedBlocks: []
