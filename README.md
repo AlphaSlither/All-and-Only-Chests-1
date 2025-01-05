@@ -53,10 +53,5 @@
 
 ---
 
-## 📜 Lizenz
-Dieses Plugin steht unter keiner bestimmten Lizenz und darf nicht ohne Zustimmung des Autors weiterverbreitet werden.
-
----
-
 Viel Spaß beim Spielen der **All & Only Chests**-Challenge!
 
