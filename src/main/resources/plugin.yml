@@ -1,5 +1,5 @@
 name: AllAndOnlyChests
-version: '1.0-SNAPSHOT'
+version: '1.21.4-1'
 main: dev.skippaddin.allAndOnlyChests.AllAndOnlyChests
 api-version: '1.21'
 commands:
