@@ -36,9 +36,6 @@
 - 💾 **Beschreibung:** Speichert den aktuellen Fortschritt manuell.
 - 🔑 **Permission:** `AllAndOnlyChests.command.save`
 
-### `/open`
-- 🔓 **Beschreibung:** Gibt alle Permissions für das Plugin.
-
 ---
 
 ## 🔄 Automatisches Speichern
