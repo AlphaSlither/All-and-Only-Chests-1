@@ -5,7 +5,6 @@ import dev.skippaddin.allAndOnlyChests.scoreboard.StructureScoreboard;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
-import net.kyori.adventure.text.format.TextColor;
 import org.bukkit.Sound;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
@@ -43,7 +42,7 @@ public class StructureCommand implements CommandExecutor {
                     p.sendMessage(textComponent);
                 }
             } else {
-                TextComponent textComponent = Component.text("").color(TextColor.color(NamedTextColor.RED)).append(Component.text("No arguments or too many provided."));
+                TextComponent textComponent = Component.text("No arguments or too many provided.", NamedTextColor.RED);
                 p.sendMessage(textComponent);
             }
         }
