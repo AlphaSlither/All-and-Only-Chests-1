@@ -54,7 +54,9 @@
 ---
 
 ## 📜 Lizenz
-Dieses Plugin darf von Dritten weiterentwickelt und verbreitet werden, solange dies **unentgeltlich** geschieht und der ursprüngliche Autor genannt wird. Jegliche kommerzielle Nutzung oder Veräußerung ist ohne ausdrückliche Zustimmung des Autors untersagt.
+Dieses Werk steht unter der Creative Commons Attribution-NonCommercial 4.0 International Lizenz.
+Mehr Informationen unter: https://creativecommons.org/licenses/by-nc/4.0/
+
 
 ---
 
