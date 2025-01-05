@@ -47,9 +47,9 @@
 
 ## 🖼️ GUI
 
-![Strukturauswahl GUI](path/to/your/first-image.png)
+![Strukturauswahl GUI](pictures/GUI-Structures.png)
 
-![Scoreboard Beispiel](path/to/your/second-image.png)
+![Items GUI](pictures/GUI-Items.png)
 
 ---
 
