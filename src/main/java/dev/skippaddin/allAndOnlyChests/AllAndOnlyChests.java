@@ -9,9 +9,9 @@ import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.entity.Player;
 import org.bukkit.event.*;
-import org.bukkit.plugin.Plugin;
 import org.bukkit.plugin.java.JavaPlugin;
 import org.bukkit.potion.PotionType;
+import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
@@ -861,6 +861,13 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         getCommand("scoreboard").setExecutor(new ScoreboardCommand());
         getCommand("scoreboard").setTabCompleter(new ScoreboardTabCompleter());
         getCommand("save").setExecutor(new SaveCommand());
+
+        new BukkitRunnable() {
+            @Override
+            public void run() {
+                saveData();
+            }
+        }.runTaskTimer(this, 6000, 6000);
     }
 
     @Override
@@ -870,8 +877,8 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
     }
 
     public void saveData() {
+        getLogger().info("Saving data...");
         if (!saved) {
-            getLogger().info("Saving data...");
             getConfig().set("selectedStructure", selectedStructure);
 
             List<String> structures = new ArrayList<>();
