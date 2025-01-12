@@ -5,6 +5,11 @@
 # The currently selected structure.
 selectedStructure: ''
 
+# If item drops are enabled. This includes drops from destroying blocks by players or other occurrences.
+# Also includes trading with villagers or interacting with containers that belong to structures, but are not counted
+# towards the progress like dispensers in trial chambers or jungle temples.
+dropsAllowed: false
+
 # All structures you have already completed. Structures are named after their LootTable keys.
 completedStructures: []
 

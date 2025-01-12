@@ -6,7 +6,7 @@
 
     <groupId>dev.skippaddin</groupId>
     <artifactId>AllAndOnlyChests</artifactId>
-    <version>1.21.4-1</version>
+    <version>1.21.4-3</version>
     <packaging>jar</packaging>
 
     <name>AllAndOnlyChests</name>

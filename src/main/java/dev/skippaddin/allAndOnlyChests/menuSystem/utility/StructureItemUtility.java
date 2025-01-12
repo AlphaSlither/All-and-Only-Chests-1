@@ -255,4 +255,12 @@ public final class StructureItemUtility {
 
         return displayName.toString();
     }
+
+    public static void processStructureItem(ItemStack item) {
+        ItemMeta originalMeta = item.getItemMeta();
+        ItemStack itemStack = new ItemStack(item.getType());
+        ItemMeta nameMeta = itemStack.getItemMeta();
+        originalMeta.setItemName(nameMeta.getItemName());
+        item.setItemMeta(originalMeta);
+    }
 }

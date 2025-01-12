@@ -2,6 +2,7 @@ package dev.skippaddin.allAndOnlyChests.listeners;
 
 import dev.skippaddin.allAndOnlyChests.AllAndOnlyChests;
 import dev.skippaddin.allAndOnlyChests.menuSystem.Menu;
+import dev.skippaddin.allAndOnlyChests.menuSystem.utility.StructureItemUtility;
 import dev.skippaddin.allAndOnlyChests.scoreboard.StructureScoreboard;
 import net.kyori.adventure.text.Component;
 import org.bukkit.Bukkit;
@@ -9,6 +10,7 @@ import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.block.BlockState;
+import org.bukkit.block.DecoratedPot;
 import org.bukkit.block.Dispenser;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
@@ -28,20 +30,6 @@ import java.util.*;
 
 public class StructureLootListener implements Listener {
 
-    private final HashSet<InventoryType> allowedInventories = new HashSet<>() {{
-        add(InventoryType.CREATIVE);
-        add(InventoryType.FURNACE);
-        add(InventoryType.ANVIL);
-        add(InventoryType.CRAFTING);
-        add(InventoryType.BLAST_FURNACE);
-        add(InventoryType.WORKBENCH);
-        add(InventoryType.GRINDSTONE);
-        add(InventoryType.BEACON);
-        add(InventoryType.CARTOGRAPHY);
-        add(InventoryType.SMOKER);
-        add(InventoryType.LECTERN);
-        add(InventoryType.ENDER_CHEST);
-    }};
 
     @EventHandler
     public void onInventoryOpen(InventoryOpenEvent e) {
@@ -49,25 +37,22 @@ public class StructureLootListener implements Listener {
         InventoryHolder holder = e.getInventory().getHolder();
         if (holder != null) {
             if (e.getInventory().getType() == InventoryType.MERCHANT || (holder instanceof Dispenser && !AllAndOnlyChests.getPlacedBlocks().contains(((BlockState) holder).getBlock())) || (e.getInventory().getType() == InventoryType.BREWING && !AllAndOnlyChests.getPlacedBlocks().contains(((BlockState) holder).getBlock()))) {
-                e.setCancelled(true);
-            } else if (holder instanceof Menu || (holder instanceof BlockState blockState && AllAndOnlyChests.getPlacedBlocks().contains(blockState.getBlock())) || allowedInventories.contains(e.getInventory().getType()) || Arrays.stream(e.getInventory().getStorageContents()).noneMatch(i -> i != null && i.hasItemMeta() && Arrays.stream(AllAndOnlyChests.getStructures()).anyMatch(s -> s.equals(i.getItemMeta().getItemName())))) {
+                if (!AllAndOnlyChests.isDropsAllowed()) {
+                    e.setCancelled(true);
+                }
+            } else if (holder instanceof Menu || (holder instanceof BlockState blockState && AllAndOnlyChests.getPlacedBlocks().contains(blockState.getBlock())) || Arrays.stream(e.getInventory().getStorageContents()).noneMatch(i -> i != null && i.hasItemMeta() && Arrays.stream(AllAndOnlyChests.getStructures()).anyMatch(s -> s.equals(i.getItemMeta().getItemName())))) {
                 return;
             } else if (!AllAndOnlyChests.getSelectedStructure().isEmpty()) {
-                ItemStack structureItem = null;
+                boolean structureChest = false;
                 for (ItemStack item : e.getInventory().getStorageContents()) {
-                    if (item != null) {
-                        ItemMeta itemMeta = item.getItemMeta();
-                        if (itemMeta != null && itemMeta.getItemName().equals(AllAndOnlyChests.getSelectedStructure())) {
-                            structureItem = item;
-                            break;
-                        }
+                    if (item != null && item.hasItemMeta() && item.getItemMeta().getItemName().equals(AllAndOnlyChests.getSelectedStructure())) {
+                        structureChest = true;
+                        StructureItemUtility.processStructureItem(item);
                     }
                 }
-                if (structureItem != null) {
+                if (structureChest) {
                     if (!AllAndOnlyChests.getSelectedStructure().equals("bastion") && !AllAndOnlyChests.getSelectedStructure().equals("trial_chambers")) {
-                        e.getInventory().remove(structureItem);
-                        HashMap<Material, Boolean> structureMats =
-                                AllAndOnlyChests.getLoot(AllAndOnlyChests.getSelectedStructure());
+                        HashMap<Material, Boolean> structureMats = AllAndOnlyChests.getLoot(AllAndOnlyChests.getSelectedStructure());
                         ArrayList<Component> newItems = new ArrayList<>();
                         for (ItemStack item : e.getInventory().getStorageContents()) {
                             if (item != null) {
@@ -84,7 +69,6 @@ public class StructureLootListener implements Listener {
                             progressChallenge(newItems, allMatch);
                         }
                     } else if (AllAndOnlyChests.getSelectedStructure().equals("bastion")) {
-                        e.getInventory().remove(structureItem);
                         HashMap<Material, Boolean> bastionMats = AllAndOnlyChests.getBastionRemnantLoot();
                         HashMap<Material, Boolean> bastionEnchantedMats =
                                 AllAndOnlyChests.getBastionRemnantEnchantedLoot();
@@ -115,8 +99,6 @@ public class StructureLootListener implements Listener {
                         }
                         //Trial chambers
                     } else {
-
-                        e.getInventory().remove(structureItem);
                         HashMap<Material, Boolean> trialChambersLoot = AllAndOnlyChests.getTrialChambersLoot();
                         HashMap<Material, Boolean> trialChambersEnchantedLoot =
                                 AllAndOnlyChests.getTrialChambersEnchantedLoot();
@@ -168,15 +150,24 @@ public class StructureLootListener implements Listener {
 
     @EventHandler
     public void onLootGenerate(LootGenerateEvent e) {
-        if (!(e.getInventoryHolder() instanceof Dispenser)) {
+        if (!(e.getInventoryHolder() instanceof Dispenser || e.getInventoryHolder() instanceof DecoratedPot)) {
             String key = e.getLootTable().getKey().toString();
             for (String structure : AllAndOnlyChests.getStructures()) {
                 if (key.contains(structure)) {
-                    ItemStack dirt = new ItemStack(Material.DIRT);
-                    ItemMeta dirtMeta = dirt.getItemMeta();
-                    dirtMeta.setItemName(structure);
-                    dirt.setItemMeta(dirtMeta);
-                    e.getLoot().add(dirt);
+
+                    if (!e.getLoot().isEmpty()) {
+                        ItemStack item = e.getLoot().getFirst();
+                        if (item.hasItemMeta()) {
+                            ItemMeta itemMeta = item.getItemMeta();
+                            itemMeta.setItemName(structure);
+                            item.setItemMeta(itemMeta);
+                        } else {
+                            ItemStack newItem = new ItemStack(item.getType());
+                            ItemMeta itemMeta = newItem.getItemMeta();
+                            itemMeta.setItemName(structure);
+                            item.setItemMeta(itemMeta);
+                        }
+                    }
                     break;
                 }
             }

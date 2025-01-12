@@ -24,9 +24,11 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
 
     private static final HashSet<Block> placedBlocks = new HashSet<>();
 
+    private static boolean dropsAllowed = false;
+
     private static final HashMap<Player, PlayerMenuUtility> playerMenuUtilityMap = new HashMap<>();
 
-    //Add trial chambers later. Bastion last, because it gets handled different
+    // Not a HashSet because the order is important
     private static final String[] structures = new String[] {
             "ancient_city",
             "buried_treasure",
@@ -47,6 +49,11 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
             "bastion",
             "trial_chambers"
     };
+
+    // HashSet of structures for quick access. Important for quick access in realtime evaluation when destroying blocks
+    private static final HashSet<String> structureMap = new HashSet<>() {{
+        this.addAll(Arrays.asList(structures));
+    }};
 
     //Cold and warm ocean ruin!!!! Multiple ruined portals!!! Multiple shipwrecks!!! Trial Chambers noch adden!!! Mineshaft mesa, Multiple villages
     private static final HashMap<String, Boolean> structureProgress = new HashMap<>() {{
@@ -675,6 +682,15 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         put(structures[15], monsterRoomLoot);
     }};
 
+    public static boolean isDropsAllowed() {
+        return dropsAllowed;
+    }
+
+    public static boolean flipDropsAllowed() {
+        dropsAllowed = !dropsAllowed;
+        return dropsAllowed;
+    }
+
     public static boolean getSaved() {
         return saved;
     }
@@ -686,6 +702,8 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
     public static String[] getStructures() {
         return structures;
     }
+
+    public static HashSet<String> getStructureMap() {return structureMap;}
 
     public static HashSet<Block> getPlacedBlocks() {
         return placedBlocks;
@@ -861,6 +879,8 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         getCommand("scoreboard").setExecutor(new ScoreboardCommand());
         getCommand("scoreboard").setTabCompleter(new ScoreboardTabCompleter());
         getCommand("save").setExecutor(new SaveCommand());
+        getCommand("drops").setExecutor(new ItemDropsCommand());
+        getCommand("drops").setTabCompleter(new ItemDropsTabCompleter());
 
         new BukkitRunnable() {
             @Override
@@ -880,6 +900,7 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         getLogger().info("Saving data...");
         if (!saved) {
             getConfig().set("selectedStructure", selectedStructure);
+            getConfig().set("dropsAllowed", dropsAllowed);
 
             List<String> structures = new ArrayList<>();
             for (HashMap.Entry<String, Boolean> entry : structureProgress.entrySet()) {
@@ -960,6 +981,10 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         getLogger().info("Loading data...");
 
         selectedStructure = getConfig().getString("selectedStructure");
+
+        if (getConfig().contains("dropsAllowed")) {
+            dropsAllowed = getConfig().getBoolean("dropsAllowed");
+        }
 
         for (String structure : getConfig().getStringList("completedStructures")) {
             structureProgress.replace(structure, true);
