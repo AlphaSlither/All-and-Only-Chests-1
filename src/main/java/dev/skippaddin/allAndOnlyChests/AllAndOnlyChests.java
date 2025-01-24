@@ -20,6 +20,8 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
 
     private static AllAndOnlyChests plugin;
 
+    private static String selectedStructure = "";
+
     private static boolean saved = false;
 
     private static final HashSet<Block> placedBlocks = new HashSet<>();
@@ -76,8 +78,6 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         put(structures[16], false);
         put(structures[17], false);
     }};
-
-    private static String selectedStructure = "";
 
     private static final HashMap<Material, Boolean> ancientCityLoot = new HashMap<>() {{
         put(Material.COAL, false);
