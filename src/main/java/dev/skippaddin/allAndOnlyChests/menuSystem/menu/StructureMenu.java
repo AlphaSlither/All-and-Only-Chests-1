@@ -1,6 +1,7 @@
 package dev.skippaddin.allAndOnlyChests.menuSystem.menu;
 
 import dev.skippaddin.allAndOnlyChests.AllAndOnlyChests;
+import dev.skippaddin.allAndOnlyChests.challenge.ChallengeData;
 import dev.skippaddin.allAndOnlyChests.menuSystem.Menu;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.PlayerMenuUtility;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.StructureItemUtility;
@@ -42,7 +43,7 @@ public class StructureMenu extends Menu {
 
     @Override
     public void setMenuItems() {
-        HashMap<String, Boolean> structures = AllAndOnlyChests.getStructureProgress();
+        HashMap<String, Boolean> structures = ChallengeData.getStructureProgress();
         List<String> unfinishedStructures = new ArrayList<>();
         for (HashMap.Entry<String, Boolean> entry : structures.entrySet()) {
             if (!entry.getValue()) {

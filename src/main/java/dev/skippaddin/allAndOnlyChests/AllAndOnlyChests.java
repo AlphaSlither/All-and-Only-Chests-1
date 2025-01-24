@@ -1,5 +1,6 @@
 package dev.skippaddin.allAndOnlyChests;
 
+import dev.skippaddin.allAndOnlyChests.challenge.ChallengeData;
 import dev.skippaddin.allAndOnlyChests.commands.*;
 import dev.skippaddin.allAndOnlyChests.listeners.*;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.PlayerMenuUtility;
@@ -22,62 +23,7 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
 
     private static String selectedStructure = "";
 
-    private static boolean saved = false;
-
-    private static final HashSet<Block> placedBlocks = new HashSet<>();
-
-    private static boolean dropsAllowed = false;
-
     private static final HashMap<Player, PlayerMenuUtility> playerMenuUtilityMap = new HashMap<>();
-
-    // Not a HashSet because the order is important
-    private static final String[] structures = new String[] {
-            "ancient_city",
-            "buried_treasure",
-            "desert_pyramid",
-            "end_city",
-            "nether_bridge",
-            "igloo",
-            "jungle_temple",
-            "underwater_ruin",
-            "pillager_outpost",
-            "ruined_portal",
-            "shipwreck",
-            "stronghold",
-            "mineshaft",
-            "village",
-            "woodland_mansion",
-            "simple_dungeon",
-            "bastion",
-            "trial_chambers"
-    };
-
-    // HashSet of structures for quick access. Important for quick access in realtime evaluation when destroying blocks
-    private static final HashSet<String> structureMap = new HashSet<>() {{
-        this.addAll(Arrays.asList(structures));
-    }};
-
-    //Cold and warm ocean ruin!!!! Multiple ruined portals!!! Multiple shipwrecks!!! Trial Chambers noch adden!!! Mineshaft mesa, Multiple villages
-    private static final HashMap<String, Boolean> structureProgress = new HashMap<>() {{
-        put(structures[0], false);
-        put(structures[1], false);
-        put(structures[2] , false);
-        put(structures[3], false);
-        put(structures[4], false);
-        put(structures[5], false);
-        put(structures[6], false);
-        put(structures[7], false);
-        put(structures[8], false);
-        put(structures[9], false);
-        put(structures[10], false);
-        put(structures[11], false);
-        put(structures[12], false);
-        put(structures[13], false);
-        put(structures[14], false);
-        put(structures[15], false);
-        put(structures[16], false);
-        put(structures[17], false);
-    }};
 
     private static final HashMap<Material, Boolean> ancientCityLoot = new HashMap<>() {{
         put(Material.COAL, false);
@@ -116,7 +62,6 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         put(Material.POTION, false);
     }};
 
-    //!!!!!!!!!!!!!! Check if enchanted crossbow and golden armor and normal. golden boots with soul speed. Enchanted dia pickaxe and dia shovel and dia sword and dia armor !!!!!!!!!!!!!!!!!!!
     private static final HashMap<Material, Boolean> bastionRemnantLoot = new HashMap<>() {{
         put(Material.LODESTONE, false);
         put(Material.ARROW, false);
@@ -682,39 +627,8 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         put(structures[15], monsterRoomLoot);
     }};
 
-    public static boolean isDropsAllowed() {
-        return dropsAllowed;
-    }
-
-    public static boolean flipDropsAllowed() {
-        dropsAllowed = !dropsAllowed;
-        return dropsAllowed;
-    }
-
-    public static boolean getSaved() {
-        return saved;
-    }
-
-    public static void setSaved(boolean b) {
-        saved = b;
-    }
-
-    public static String[] getStructures() {
-        return structures;
-    }
-
-    public static HashSet<String> getStructureMap() {return structureMap;}
-
-    public static HashSet<Block> getPlacedBlocks() {
-        return placedBlocks;
-    }
-
     public static void setSelectedStructure(String selectedStructure) {
         AllAndOnlyChests.selectedStructure = selectedStructure;
-    }
-
-    public static HashMap<String, Boolean> getStructureProgress() {
-        return structureProgress;
     }
 
     public static String getSelectedStructure() {
@@ -898,12 +812,12 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
 
     public void saveData() {
         getLogger().info("Saving data...");
-        if (!saved) {
+        if (!ChallengeData.getSaved()) {
             getConfig().set("selectedStructure", selectedStructure);
-            getConfig().set("dropsAllowed", dropsAllowed);
+            getConfig().set("dropsAllowed", ChallengeData.isDropsAllowed());
 
             List<String> structures = new ArrayList<>();
-            for (HashMap.Entry<String, Boolean> entry : structureProgress.entrySet()) {
+            for (HashMap.Entry<String, Boolean> entry : ChallengeData.getStructureProgress().entrySet()) {
                 if (entry.getValue()) {
                     structures.add(entry.getKey());
                 }
@@ -957,7 +871,7 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
             }
 
             List<Map<String, Object>> serializedLocations = new ArrayList<>();
-            for (Block block : placedBlocks) {
+            for (Block block : ChallengeData.getPlacedBlocks()) {
                 serializedLocations.add(block.getLocation().serialize()); // Serialize each location
             }
 
@@ -970,7 +884,7 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
             getConfig().set("placedBlocks", serializedLocations);
             saveConfig();
 
-            saved = true;
+            ChallengeData.setSaved(true);
             getLogger().info("Data saved");
         } else {
             getLogger().info("Data already saved after recent changes");
@@ -983,11 +897,11 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         selectedStructure = getConfig().getString("selectedStructure");
 
         if (getConfig().contains("dropsAllowed")) {
-            dropsAllowed = getConfig().getBoolean("dropsAllowed");
+            ChallengeData.setDropsAllowed(getConfig().getBoolean("dropsAllowed"));
         }
 
         for (String structure : getConfig().getStringList("completedStructures")) {
-            structureProgress.replace(structure, true);
+            ChallengeData.getStructureProgress().replace(structure, true);
         }
 
         if (!selectedStructure.isEmpty()) {
@@ -1026,7 +940,7 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         }
         for (Location location : locations) {
             Block block = location.getBlock();
-            placedBlocks.add(block);
+            ChallengeData.getPlacedBlocks().add(block);
         }
     }
 

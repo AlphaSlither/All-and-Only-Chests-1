@@ -1,6 +1,7 @@
 package dev.skippaddin.allAndOnlyChests.listeners;
 
 import dev.skippaddin.allAndOnlyChests.AllAndOnlyChests;
+import dev.skippaddin.allAndOnlyChests.challenge.ChallengeData;
 import dev.skippaddin.allAndOnlyChests.menuSystem.Menu;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.StructureItemUtility;
 import dev.skippaddin.allAndOnlyChests.scoreboard.StructureScoreboard;
@@ -36,11 +37,11 @@ public class StructureLootListener implements Listener {
 
         InventoryHolder holder = e.getInventory().getHolder();
         if (holder != null) {
-            if (e.getInventory().getType() == InventoryType.MERCHANT || (holder instanceof Dispenser && !AllAndOnlyChests.getPlacedBlocks().contains(((BlockState) holder).getBlock())) || (e.getInventory().getType() == InventoryType.BREWING && !AllAndOnlyChests.getPlacedBlocks().contains(((BlockState) holder).getBlock()))) {
-                if (!AllAndOnlyChests.isDropsAllowed()) {
+            if (e.getInventory().getType() == InventoryType.MERCHANT || (holder instanceof Dispenser && !ChallengeData.getPlacedBlocks().contains(((BlockState) holder).getBlock())) || (e.getInventory().getType() == InventoryType.BREWING && !ChallengeData.getPlacedBlocks().contains(((BlockState) holder).getBlock()))) {
+                if (!ChallengeData.isDropsAllowed()) {
                     e.setCancelled(true);
                 }
-            } else if (holder instanceof Menu || (holder instanceof BlockState blockState && AllAndOnlyChests.getPlacedBlocks().contains(blockState.getBlock())) || Arrays.stream(e.getInventory().getStorageContents()).noneMatch(i -> i != null && i.hasItemMeta() && Arrays.stream(AllAndOnlyChests.getStructures()).anyMatch(s -> s.equals(i.getItemMeta().getItemName())))) {
+            } else if (holder instanceof Menu || (holder instanceof BlockState blockState && ChallengeData.getPlacedBlocks().contains(blockState.getBlock())) || Arrays.stream(e.getInventory().getStorageContents()).noneMatch(i -> i != null && i.hasItemMeta() && Arrays.stream(ChallengeData.getStructures()).anyMatch(s -> s.equals(i.getItemMeta().getItemName())))) {
                 return;
             } else if (!AllAndOnlyChests.getSelectedStructure().isEmpty()) {
                 boolean structureChest = false;
@@ -116,7 +117,7 @@ public class StructureLootListener implements Listener {
                             progressChallenge(newItems, allMatch);
                         }
                     }
-                    AllAndOnlyChests.setSaved(false);
+                    ChallengeData.setSaved(false);
                 } else {
                     e.setCancelled(true);
                 }
@@ -128,7 +129,7 @@ public class StructureLootListener implements Listener {
 
     private void progressChallenge(ArrayList<Component> items, boolean allMatch) {
         if (allMatch) {
-            AllAndOnlyChests.getStructureProgress().replace(AllAndOnlyChests.getSelectedStructure(), true);
+            ChallengeData.getStructureProgress().replace(AllAndOnlyChests.getSelectedStructure(), true);
             AllAndOnlyChests.setSelectedStructure("");
         }
         for (Player player : Bukkit.getOnlinePlayers()) {
@@ -152,7 +153,7 @@ public class StructureLootListener implements Listener {
     public void onLootGenerate(LootGenerateEvent e) {
         if (!(e.getInventoryHolder() instanceof Dispenser || e.getInventoryHolder() instanceof DecoratedPot)) {
             String key = e.getLootTable().getKey().toString();
-            for (String structure : AllAndOnlyChests.getStructures()) {
+            for (String structure : ChallengeData.getStructures()) {
                 if (key.contains(structure)) {
 
                     if (!e.getLoot().isEmpty()) {
@@ -202,7 +203,7 @@ public class StructureLootListener implements Listener {
                     allMatch =
                             trialChambersLoot.values().stream().allMatch(b -> b) && trialChambersEnchantedLoot.values().stream().allMatch(b -> b) && trialChambersArrows.values().stream().allMatch(b -> b) && trialChambersPotions.values().stream().allMatch(b -> b);
                     if (allMatch) {
-                        AllAndOnlyChests.getStructureProgress().replace(AllAndOnlyChests.getSelectedStructure(), true);
+                        ChallengeData.getStructureProgress().replace(AllAndOnlyChests.getSelectedStructure(), true);
                         AllAndOnlyChests.setSelectedStructure("");
                     }
                 }
@@ -211,7 +212,7 @@ public class StructureLootListener implements Listener {
                 StructureScoreboard scoreboard = StructureScoreboard.getInstance();
                 scoreboard.updateChests();
 
-                AllAndOnlyChests.setSaved(false);
+                ChallengeData.setSaved(false);
 
                 new BukkitRunnable() {
 

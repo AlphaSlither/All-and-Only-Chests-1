@@ -1,6 +1,7 @@
 package dev.skippaddin.allAndOnlyChests.menuSystem.menu;
 
 import dev.skippaddin.allAndOnlyChests.AllAndOnlyChests;
+import dev.skippaddin.allAndOnlyChests.challenge.ChallengeData;
 import dev.skippaddin.allAndOnlyChests.menuSystem.Menu;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.CustomHeadUtility;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.PlayerMenuUtility;
@@ -168,7 +169,7 @@ public class StructureItemMenu extends Menu {
                 }
 
             } else if (e.getSlot() == 4) {
-                if (AllAndOnlyChests.getSelectedStructure().isEmpty() && !AllAndOnlyChests.getStructureProgress().get(item.getItemMeta().getItemName())) {
+                if (AllAndOnlyChests.getSelectedStructure().isEmpty() && !ChallengeData.getStructureProgress().get(item.getItemMeta().getItemName())) {
                     Player player = playerMenuUtility.getOwner();
                     String itemName = item.getItemMeta().getItemName();
                     AllAndOnlyChests.setSelectedStructure(itemName);
@@ -182,6 +183,7 @@ public class StructureItemMenu extends Menu {
                     player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
                     StructureScoreboard scoreboard = StructureScoreboard.getInstance();
                     scoreboard.updateStructure(item.getItemMeta().getDisplayName(), items.size());
+                    ChallengeData.setSaved(false);
                 }
             }
         }
