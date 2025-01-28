@@ -42,7 +42,6 @@ public class BastionRemnant extends Structure {
         put(Material.PIGLIN_BANNER_PATTERN, false);
         put(Material.GOLDEN_APPLE, false);
         put(Material.DIAMOND_SHOVEL, false);
-        put(Material.DIAMOND_PICKAXE, false);
         put(Material.MUSIC_DISC_PIGSTEP, false);
         put(Material.NETHERITE_SCRAP, false);
         put(Material.CRIMSON_FUNGUS, false);
@@ -79,7 +78,7 @@ public class BastionRemnant extends Structure {
     }};
 
     public static int getItemCount() {
-        return 65;
+        return 64;
     }
 
     @Override

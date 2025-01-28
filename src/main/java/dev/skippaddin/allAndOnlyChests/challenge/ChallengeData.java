@@ -1,5 +1,6 @@
 package dev.skippaddin.allAndOnlyChests.challenge;
 
+import dev.skippaddin.allAndOnlyChests.structures.EmptyStructure;
 import dev.skippaddin.allAndOnlyChests.structures.Structure;
 import org.bukkit.block.Block;
 
@@ -11,7 +12,7 @@ public final class ChallengeData {
 
     private ChallengeData() {}
 
-    private static Structure selectedStructure = null;
+    private static Structure selectedStructure = new EmptyStructure();
 
     private static boolean saved = false;
 
@@ -66,6 +67,14 @@ public final class ChallengeData {
         put(structures[16], false);
         put(structures[17], false);
     }};
+
+    public static Structure getSelectedStructure() {
+        return selectedStructure;
+    }
+
+    public static void setSelectedStructure(Structure structure) {
+        selectedStructure = structure;
+    }
 
     public static boolean getSaved() {
         return saved;

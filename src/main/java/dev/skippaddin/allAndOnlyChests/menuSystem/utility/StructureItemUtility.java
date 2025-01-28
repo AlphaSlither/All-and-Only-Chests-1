@@ -1,6 +1,7 @@
 package dev.skippaddin.allAndOnlyChests.menuSystem.utility;
 
-import dev.skippaddin.allAndOnlyChests.AllAndOnlyChests;
+import dev.skippaddin.allAndOnlyChests.challenge.ChallengeData;
+import dev.skippaddin.allAndOnlyChests.structures.*;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.DyeColor;
@@ -27,32 +28,30 @@ public final class StructureItemUtility {
             case "ancient_city":
                 ItemStack ancientCityItem = new ItemStack(Material.SCULK_SHRIEKER);
                 ItemMeta ancientCityItemItemMeta = ancientCityItem.getItemMeta();
-                generateItemMeta(ancientCityItemItemMeta, structure, AllAndOnlyChests.getAncientCityLoot());
+                generateItemMeta(ancientCityItemItemMeta, structure, AncientCity.getItemCount());
                 ancientCityItem.setItemMeta(ancientCityItemItemMeta);
                 return ancientCityItem;
             case "bastion":
                 ItemStack bastionRemnantItem = new ItemStack(Material.PIGLIN_HEAD);
                 ItemMeta bastionRemnantItemMeta = bastionRemnantItem.getItemMeta();
-                generateItemMeta(bastionRemnantItemMeta, structure, AllAndOnlyChests.getBastionRemnantLoot());
+                generateItemMeta(bastionRemnantItemMeta, structure, BastionRemnant.getItemCount());
                 //Overwriting Lore because bastion remnant is special case because of non-enchanted and enchanted items
-                int maxCount = AllAndOnlyChests.getBastionRemnantLoot().size();
-                maxCount += AllAndOnlyChests.getBastionRemnantEnchantedLoot().size();
-                if (structure.equals(AllAndOnlyChests.getSelectedStructure())) {
+                if (structure.equals(ChallengeData.getSelectedStructure().getName())) {
                     int collected = 0;
-                    for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getBastionRemnantLoot().entrySet()) {
+                    for (HashMap.Entry<Material, Boolean> entry : ChallengeData.getSelectedStructure().getLoot().entrySet()) {
                         if (entry.getValue()) {
                             collected++;
                         }
                     }
                     for (HashMap.Entry<Material, Boolean> entry :
-                            AllAndOnlyChests.getBastionRemnantEnchantedLoot().entrySet()) {
+                            ((BastionRemnant) ChallengeData.getSelectedStructure()).getEnchantedLoot().entrySet()) {
                         if (entry.getValue()) {
                             collected++;
                         }
                     }
-                    bastionRemnantItemMeta.lore(List.of(Component.text(collected + "/" + maxCount + " items", NamedTextColor.YELLOW)));
+                    bastionRemnantItemMeta.lore(List.of(Component.text(collected + "/" + BastionRemnant.getItemCount() + " items", NamedTextColor.YELLOW)));
                 } else {
-                    bastionRemnantItemMeta.lore(List.of(Component.text(maxCount + " items", NamedTextColor.RED)));
+                    bastionRemnantItemMeta.lore(List.of(Component.text(BastionRemnant.getItemCount() + " items", NamedTextColor.RED)));
                     String displayName = formatString(structure);
                     // Minecraft sets Color to Yellow automatically for piglin head
                     bastionRemnantItemMeta.displayName(Component.text(displayName, NamedTextColor.WHITE));
@@ -62,26 +61,26 @@ public final class StructureItemUtility {
             case "buried_treasure":
                 ItemStack buriedTreasureItem = new ItemStack(Material.IRON_SHOVEL);
                 ItemMeta buriedTreasureItemMeta = buriedTreasureItem.getItemMeta();
-                generateItemMeta(buriedTreasureItemMeta, structure, AllAndOnlyChests.getBuriedTreasureLoot());
+                generateItemMeta(buriedTreasureItemMeta, structure, BuriedTreasure.getItemCount());
                 buriedTreasureItem.setItemMeta(buriedTreasureItemMeta);
                 return buriedTreasureItem;
             case "desert_pyramid":
                 ItemStack desertPyramidItem = new ItemStack(Material.CHISELED_SANDSTONE);
                 ItemMeta desertPyramidItemMeta = desertPyramidItem.getItemMeta();
-                generateItemMeta(desertPyramidItemMeta, structure, AllAndOnlyChests.getDesertPyramidLoot());
+                generateItemMeta(desertPyramidItemMeta, structure, DesertPyramid.getItemCount());
                 desertPyramidItem.setItemMeta(desertPyramidItemMeta);
                 return desertPyramidItem;
             case "end_city":
                 ItemStack endCityItem = new ItemStack(Material.SHULKER_BOX);
                 ItemMeta endCityItemMeta = endCityItem.getItemMeta();
-                generateItemMeta(endCityItemMeta, structure, AllAndOnlyChests.getEndCityLoot());
+                generateItemMeta(endCityItemMeta, structure, EndCity.getItemCount());
                 endCityItem.setItemMeta(endCityItemMeta);
                 return endCityItem;
             case "nether_bridge":
                 ItemStack fortressItem = new ItemStack(Material.BLAZE_ROD);
                 ItemMeta fortressItemMeta = fortressItem.getItemMeta();
-                generateItemMeta(fortressItemMeta, structure, AllAndOnlyChests.getNetherFortressLoot());
-                if (AllAndOnlyChests.getSelectedStructure().equals(structure)) {
+                generateItemMeta(fortressItemMeta, structure, NetherFortress.getItemCount());
+                if (ChallengeData.getSelectedStructure().getName().equals(structure)) {
                     fortressItemMeta.displayName(Component.text("Fortress", NamedTextColor.YELLOW));
                 } else {
                     fortressItemMeta.displayName(Component.text("Fortress"));
@@ -91,20 +90,20 @@ public final class StructureItemUtility {
             case "igloo":
                 ItemStack iglooItem = new ItemStack(Material.SNOW_BLOCK);
                 ItemMeta iglooItemMeta = iglooItem.getItemMeta();
-                generateItemMeta(iglooItemMeta, structure, AllAndOnlyChests.getIglooLoot());
+                generateItemMeta(iglooItemMeta, structure, Igloo.getItemCount());
                 iglooItem.setItemMeta(iglooItemMeta);
                 return iglooItem;
             case "jungle_temple":
                 ItemStack junglePyramidItem = new ItemStack(Material.TRIPWIRE_HOOK);
                 ItemMeta junglePyramidItemMeta = junglePyramidItem.getItemMeta();
-                generateItemMeta(junglePyramidItemMeta, structure, AllAndOnlyChests.getJunglePyramidLoot());
+                generateItemMeta(junglePyramidItemMeta, structure, JunglePyramid.getItemCount());
                 junglePyramidItem.setItemMeta(junglePyramidItemMeta);
                 return junglePyramidItem;
             case "underwater_ruin":
                 ItemStack oceanRuinItem = new ItemStack(Material.POLISHED_GRANITE);
                 ItemMeta oceanRuinItemMeta = oceanRuinItem.getItemMeta();
-                generateItemMeta(oceanRuinItemMeta, structure, AllAndOnlyChests.getOceanRuinLoot());
-                if (AllAndOnlyChests.getSelectedStructure().equals(structure)) {
+                generateItemMeta(oceanRuinItemMeta, structure, OceanRuin.getItemCount());
+                if (ChallengeData.getSelectedStructure().getName().equals(structure)) {
                     oceanRuinItemMeta.displayName(Component.text("Ocean Ruin", NamedTextColor.YELLOW));
                 } else {
                     oceanRuinItemMeta.displayName(Component.text("Ocean Ruin"));
@@ -115,44 +114,44 @@ public final class StructureItemUtility {
                 ItemStack pillagerOutpostItem = new ItemStack(Material.WHITE_BANNER);
                 ItemMeta pillagerOutpostItemMeta = pillagerOutpostItem.getItemMeta();
                 BannerMeta bannerMeta = getBannerMeta((BannerMeta) pillagerOutpostItemMeta);
-                generateItemMeta(bannerMeta, structure, AllAndOnlyChests.getPillagerOutpostLoot());
+                generateItemMeta(bannerMeta, structure, PillagerOutpost.getItemCount());
                 pillagerOutpostItem.setItemMeta(bannerMeta);
                 return pillagerOutpostItem;
             case "ruined_portal":
                 ItemStack ruinedPortalItem = new ItemStack(Material.OBSIDIAN);
                 ItemMeta ruinedPortalItemMeta = ruinedPortalItem.getItemMeta();
-                generateItemMeta(ruinedPortalItemMeta, structure, AllAndOnlyChests.getRuinedPortalLoot());
+                generateItemMeta(ruinedPortalItemMeta, structure, RuinedPortal.getItemCount());
                 ruinedPortalItem.setItemMeta(ruinedPortalItemMeta);
                 return ruinedPortalItem;
             case "shipwreck":
                 ItemStack shipwreckItem = new ItemStack(Material.FILLED_MAP);
                 ItemMeta shipwreckItemMeta = shipwreckItem.getItemMeta();
-                generateItemMeta(shipwreckItemMeta, structure, AllAndOnlyChests.getShipwreckLoot());
+                generateItemMeta(shipwreckItemMeta, structure, Shipwreck.getItemCount());
                 shipwreckItem.setItemMeta(shipwreckItemMeta);
                 return shipwreckItem;
             case "stronghold":
                 ItemStack strongholdItem = new ItemStack(Material.END_PORTAL_FRAME);
                 ItemMeta strongholdItemMeta = strongholdItem.getItemMeta();
-                generateItemMeta(strongholdItemMeta, structure, AllAndOnlyChests.getStrongholdLoot());
+                generateItemMeta(strongholdItemMeta, structure, Stronghold.getItemCount());
                 strongholdItem.setItemMeta(strongholdItemMeta);
                 return strongholdItem;
             case "mineshaft":
                 ItemStack mineshaftItem = new ItemStack(Material.CHEST_MINECART);
                 ItemMeta mineshaftItemMeta = mineshaftItem.getItemMeta();
-                generateItemMeta(mineshaftItemMeta, structure, AllAndOnlyChests.getMineshaftLoot());
+                generateItemMeta(mineshaftItemMeta, structure, Mineshaft.getItemCount());
                 mineshaftItem.setItemMeta(mineshaftItemMeta);
                 return mineshaftItem;
             case "village":
                 ItemStack villageItem = new ItemStack(Material.HAY_BLOCK);
                 ItemMeta villageItemMeta = villageItem.getItemMeta();
-                generateItemMeta(villageItemMeta, structure, AllAndOnlyChests.getVillageLoot());
+                generateItemMeta(villageItemMeta, structure, Village.getItemCount());
                 villageItem.setItemMeta(villageItemMeta);
                 return villageItem;
             case "woodland_mansion":
                 ItemStack mansionItem = new ItemStack(Material.TOTEM_OF_UNDYING);
                 ItemMeta mansionItemMeta = mansionItem.getItemMeta();
-                generateItemMeta(mansionItemMeta, structure, AllAndOnlyChests.getWoodlandMansionLoot());
-                if (!AllAndOnlyChests.getSelectedStructure().equals(structure)) {
+                generateItemMeta(mansionItemMeta, structure, WoodlandMansion.getItemCount());
+                if (!ChallengeData.getSelectedStructure().getName().equals(structure)) {
                     String displayName = formatString(structure);
                     mansionItemMeta.customName(Component.text(displayName, NamedTextColor.WHITE));
                 }
@@ -161,9 +160,9 @@ public final class StructureItemUtility {
             case "simple_dungeon":
                 ItemStack monsterRoomItem = new ItemStack(Material.SPAWNER);
                 ItemMeta monsterRoomItemMeta = monsterRoomItem.getItemMeta();
-                generateItemMeta(monsterRoomItemMeta, structure, AllAndOnlyChests.getMonsterRoomLoot());
+                generateItemMeta(monsterRoomItemMeta, structure, MonsterRoom.getItemCount());
                 monsterRoomItemMeta.addItemFlags(ItemFlag.HIDE_ADDITIONAL_TOOLTIP);
-                if (AllAndOnlyChests.getSelectedStructure().equals(structure)) {
+                if (ChallengeData.getSelectedStructure().getName().equals(structure)) {
                     monsterRoomItemMeta.displayName(Component.text("Monster Room", NamedTextColor.YELLOW));
                 } else {
                     monsterRoomItemMeta.displayName(Component.text("Monster Room"));
@@ -173,36 +172,31 @@ public final class StructureItemUtility {
             case "trial_chambers":
                 ItemStack trialChambersItem = new ItemStack(Material.VAULT);
                 ItemMeta trialChambersItemMeta = trialChambersItem.getItemMeta();
-                generateItemMeta(trialChambersItemMeta, structure, AllAndOnlyChests.getTrialChambersLoot());
-                int itemMaxCount = AllAndOnlyChests.getTrialChambersLoot().size() +
-                        AllAndOnlyChests.getTrialChambersEnchantedLoot().size() +
-                        AllAndOnlyChests.getTrialChambersPotions().size() +
-                        AllAndOnlyChests.getTrialChambersArrowEffects().size();
-                if (structure.equals(AllAndOnlyChests.getSelectedStructure())) {
+                generateItemMeta(trialChambersItemMeta, structure, TrialChambers.getItemCount());
+                if (structure.equals(ChallengeData.getSelectedStructure().getName())) {
+                    TrialChambers trialChambers = (TrialChambers) ChallengeData.getSelectedStructure();
                     int collected = 0;
-                    for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getTrialChambersLoot().entrySet()) {
+                    for (HashMap.Entry<Material, Boolean> entry : trialChambers.getLoot().entrySet()) {
                         if (entry.getValue()) {
                             collected++;
                         }
                     }
-                    for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getTrialChambersEnchantedLoot().entrySet()) {
+                    if (trialChambers.getEnchantedLoot().getValue()) {
+                        collected++;
+                    }
+                    for (HashMap.Entry<PotionType, Boolean> entry : trialChambers.getArrowEffects().entrySet()) {
                         if (entry.getValue()) {
                             collected++;
                         }
                     }
-                    for (HashMap.Entry<PotionType, Boolean> entry : AllAndOnlyChests.getTrialChambersArrowEffects().entrySet()) {
+                    for (HashMap.Entry<PotionType, Boolean> entry : trialChambers.getPotions().entrySet()) {
                         if (entry.getValue()) {
                             collected++;
                         }
                     }
-                    for (HashMap.Entry<PotionType, Boolean> entry : AllAndOnlyChests.getTrialChambersPotions().entrySet()) {
-                        if (entry.getValue()) {
-                            collected++;
-                        }
-                    }
-                    trialChambersItemMeta.lore(List.of(Component.text(collected + "/" + itemMaxCount + " items", NamedTextColor.YELLOW)));
+                    trialChambersItemMeta.lore(List.of(Component.text(collected + "/" + TrialChambers.getItemCount() + " items", NamedTextColor.YELLOW)));
                 } else {
-                    trialChambersItemMeta.lore(List.of(Component.text(itemMaxCount + " items", NamedTextColor.RED)));
+                    trialChambersItemMeta.lore(List.of(Component.text(TrialChambers.getItemCount() + " items", NamedTextColor.RED)));
                 }
                 trialChambersItem.setItemMeta(trialChambersItemMeta);
                 return trialChambersItem;
@@ -223,24 +217,23 @@ public final class StructureItemUtility {
     }
 
 
-    private static void generateItemMeta(ItemMeta itemMeta, String structure, HashMap<Material, Boolean> loot) {
+    private static void generateItemMeta(ItemMeta itemMeta, String structure, int itemCount) {
         itemMeta.itemName(Component.text(structure));
         String displayName = formatString(structure);
-        int maxCount = loot.size();
-        if (structure.equals(AllAndOnlyChests.getSelectedStructure())) {
+        if (structure.equals(ChallengeData.getSelectedStructure().getName())) {
             itemMeta.customName(Component.text(displayName, NamedTextColor.YELLOW));
             itemMeta.addEnchant(Enchantment.BREACH, 1, true);
             itemMeta.addItemFlags(ItemFlag.HIDE_ENCHANTS);
             int collected = 0;
-            for (HashMap.Entry<Material, Boolean> entry : loot.entrySet()) {
+            for (HashMap.Entry<Material, Boolean> entry : ChallengeData.getSelectedStructure().getLoot().entrySet()) {
                 if (entry.getValue()) {
                     collected++;
                 }
             }
-            itemMeta.lore(List.of(Component.text(collected + "/" + maxCount + " items", NamedTextColor.YELLOW)));
+            itemMeta.lore(List.of(Component.text(collected + "/" + itemCount + " items", NamedTextColor.YELLOW)));
         } else {
             itemMeta.displayName(Component.text(displayName));
-            itemMeta.lore(List.of(Component.text(maxCount + " items", NamedTextColor.RED)));
+            itemMeta.lore(List.of(Component.text(itemCount + " items", NamedTextColor.RED)));
         }
     }
 
