@@ -26,6 +26,7 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
 
     private static final HashMap<Player, PlayerMenuUtility> playerMenuUtilityMap = new HashMap<>();
 
+
     public static PlayerMenuUtility getPlayerMenuUtility(Player p) {
         PlayerMenuUtility playerMenuUtility;
         if (!playerMenuUtilityMap.containsKey(p)) {
