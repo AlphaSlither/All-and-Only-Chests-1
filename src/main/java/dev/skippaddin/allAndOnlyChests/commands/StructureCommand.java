@@ -1,7 +1,8 @@
 package dev.skippaddin.allAndOnlyChests.commands;
 
-import dev.skippaddin.allAndOnlyChests.AllAndOnlyChests;
+import dev.skippaddin.allAndOnlyChests.challenge.ChallengeData;
 import dev.skippaddin.allAndOnlyChests.scoreboard.StructureScoreboard;
+import dev.skippaddin.allAndOnlyChests.structures.EmptyStructure;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.TextComponent;
 import net.kyori.adventure.text.format.NamedTextColor;
@@ -20,15 +21,15 @@ public class StructureCommand implements CommandExecutor {
             if (args.length == 1) {
                 if (args[0].equalsIgnoreCase("finish")) {
                     if (p.hasPermission("AllAndOnlyChests.command.structure.finish")) {
-                        if (!AllAndOnlyChests.getSelectedStructure().isEmpty()) {
-                            AllAndOnlyChests.getStructureProgress().replace(AllAndOnlyChests.getSelectedStructure(), true);
-                            AllAndOnlyChests.setSelectedStructure("");
+                        if (!(ChallengeData.getSelectedStructure().getName().isEmpty())) {
+                            ChallengeData.getStructureProgress().replace(ChallengeData.getSelectedStructure().getName(), true);
+                            ChallengeData.setSelectedStructure(new EmptyStructure());
                             TextComponent textComponent = Component.text("Structure completed!", NamedTextColor.GOLD);
                             p.sendMessage(textComponent);
                             p.playSound(p, Sound.UI_TOAST_CHALLENGE_COMPLETE, 1f, 1f);
                             StructureScoreboard scoreboard = StructureScoreboard.getInstance();
                             scoreboard.complete();
-                            AllAndOnlyChests.setSaved(false);
+                            ChallengeData.setSaved(false);
                         } else {
                             TextComponent textComponent = Component.text("No structure selected!", NamedTextColor.RED);
                             p.sendMessage(textComponent);

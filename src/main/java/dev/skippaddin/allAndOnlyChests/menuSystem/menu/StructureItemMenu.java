@@ -1,11 +1,14 @@
 package dev.skippaddin.allAndOnlyChests.menuSystem.menu;
 
-import dev.skippaddin.allAndOnlyChests.AllAndOnlyChests;
+import dev.skippaddin.allAndOnlyChests.challenge.ChallengeData;
 import dev.skippaddin.allAndOnlyChests.menuSystem.Menu;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.CustomHeadUtility;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.PlayerMenuUtility;
 import dev.skippaddin.allAndOnlyChests.menuSystem.utility.StructureItemUtility;
 import dev.skippaddin.allAndOnlyChests.scoreboard.StructureScoreboard;
+import dev.skippaddin.allAndOnlyChests.structures.BastionRemnant;
+import dev.skippaddin.allAndOnlyChests.structures.TrialChambers;
+import dev.skippaddin.allAndOnlyChests.structures.utility.StructureUtility;
 import org.bukkit.ChatColor;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -35,19 +38,20 @@ public class StructureItemMenu extends Menu {
     private static final ItemStack arrowUpItem = generateArrows(ChatColor.GREEN + "Scroll up", "http://textures" +
             ".minecraft.net/texture/7d695d335e6be8cb2a34e05e18ea2d12c3b17b8166ba62d6982a643df71ffac5");
 
-    private static final ItemStack arrowDownItem = generateArrows(ChatColor.GREEN + "Scroll Down", "http://textures" +
-            ".minecraft.net/texture/437862cdc159998ed6b6fdccaaa4675867d4484db512a84c367fabf4caf60");
+    private static final ItemStack arrowDownItem = generateArrows(ChatColor.GREEN + "Scroll Down",
+            "http://textures" + ".minecraft.net/texture/437862cdc159998ed6b6fdccaaa4675867d4484db512a84c367fabf4caf60");
 
     public StructureItemMenu(PlayerMenuUtility playerMenuUtility, ItemStack item) {
         super(playerMenuUtility);
         ItemMeta itemMeta = item.getItemMeta();
         String lore;
-        if (AllAndOnlyChests.getSelectedStructure().isEmpty()) {
+        if (ChallengeData.getSelectedStructure().getName().isEmpty()) {
             lore = ChatColor.GREEN + "Click to select.";
-        } else if (AllAndOnlyChests.getSelectedStructure().equals(itemMeta.getItemName())) {
+        } else if (ChallengeData.getSelectedStructure().getName().equals(itemMeta.getItemName())) {
             lore = ChatColor.GOLD + "Selected.";
         } else {
-            String selectedStructure = StructureItemUtility.formatString(AllAndOnlyChests.getSelectedStructure());
+            String selectedStructure =
+                    StructureItemUtility.formatString(ChallengeData.getSelectedStructure().getName());
             lore = ChatColor.RED + selectedStructure + " selected.";
         }
         itemMeta.setLore(List.of(lore));
@@ -66,7 +70,8 @@ public class StructureItemMenu extends Menu {
 
     @Override
     public String getMenuName() {
-        if (item.getItemMeta().getItemName().equals("bastion") || item.getItemMeta().getItemName().equals("woodland_mansion")) {
+        if (item.getItemMeta().getItemName().equals("bastion") || item.getItemMeta().getItemName().equals(
+                "woodland_mansion")) {
             String menuName = StructureItemUtility.formatString(item.getItemMeta().getItemName());
             return ChatColor.DARK_GRAY + menuName;
         }
@@ -168,13 +173,14 @@ public class StructureItemMenu extends Menu {
                 }
 
             } else if (e.getSlot() == 4) {
-                if (AllAndOnlyChests.getSelectedStructure().isEmpty() && !AllAndOnlyChests.getStructureProgress().get(item.getItemMeta().getItemName())) {
+                if (ChallengeData.getSelectedStructure().getName().isEmpty() && !ChallengeData.getStructureProgress().get(item.getItemMeta().getItemName())) {
                     Player player = playerMenuUtility.getOwner();
                     String itemName = item.getItemMeta().getItemName();
-                    AllAndOnlyChests.setSelectedStructure(itemName);
+                    ChallengeData.setSelectedStructure(StructureUtility.getStructure(itemName));
                     player.closeInventory();
                     if (!itemName.equals("bastion") && !itemName.equals("woodland_mansion")) {
-                        player.sendTitle(ChatColor.YELLOW + item.getItemMeta().getDisplayName(), ChatColor.YELLOW + "started!");
+                        player.sendTitle(ChatColor.YELLOW + item.getItemMeta().getDisplayName(), ChatColor.YELLOW +
+                                "started!");
                     } else {
                         String title = StructureItemUtility.formatString(itemName);
                         player.sendTitle(ChatColor.YELLOW + title, ChatColor.YELLOW + "started!");
@@ -182,6 +188,7 @@ public class StructureItemMenu extends Menu {
                     player.playSound(player, Sound.ENTITY_PLAYER_LEVELUP, 1f, 1f);
                     StructureScoreboard scoreboard = StructureScoreboard.getInstance();
                     scoreboard.updateStructure(item.getItemMeta().getDisplayName(), items.size());
+                    ChallengeData.setSaved(false);
                 }
             }
         }
@@ -218,29 +225,29 @@ public class StructureItemMenu extends Menu {
         inventory.setItem(5, greenGlass);
 
         if (item.getItemMeta().getItemName().equals("bastion")) {
-            for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getBastionRemnantLoot().entrySet()) {
+            BastionRemnant bastionRemnant = new BastionRemnant();
+            for (HashMap.Entry<Material, Boolean> entry : bastionRemnant.getLoot().entrySet()) {
                 if (!entry.getValue()) {
                     items.add(buildItem(entry.getKey()));
                 }
             }
-            for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getBastionRemnantEnchantedLoot().entrySet()) {
+            for (HashMap.Entry<Material, Boolean> entry : bastionRemnant.getLoot().entrySet()) {
                 if (!entry.getValue()) {
                     items.add(buildEnchantedItem(entry.getKey()));
                 }
             }
 
         } else if (item.getItemMeta().getItemName().equals("trial_chambers")) {
-            for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getTrialChambersLoot().entrySet()) {
+            TrialChambers trialChambers = new TrialChambers();
+            for (HashMap.Entry<Material, Boolean> entry : trialChambers.getLoot().entrySet()) {
                 if (!entry.getValue()) {
                     items.add(buildItem(entry.getKey()));
                 }
             }
-            for (HashMap.Entry<Material, Boolean> entry : AllAndOnlyChests.getTrialChambersEnchantedLoot().entrySet()) {
-                if (!entry.getValue()) {
-                    items.add(buildEnchantedItem(entry.getKey()));
-                }
+            if (!trialChambers.getEnchantedLoot().getValue()) {
+                items.add(buildEnchantedItem(trialChambers.getEnchantedLoot().getKey()));
             }
-            for (HashMap.Entry<PotionType, Boolean> entry : AllAndOnlyChests.getTrialChambersPotions().entrySet()) {
+            for (HashMap.Entry<PotionType, Boolean> entry : trialChambers.getPotions().entrySet()) {
                 if (!entry.getValue()) {
                     ItemStack potion = new ItemStack(Material.POTION);
                     PotionMeta potionMeta = (PotionMeta) potion.getItemMeta();
@@ -249,7 +256,7 @@ public class StructureItemMenu extends Menu {
                     items.add(potion);
                 }
             }
-            for (HashMap.Entry<PotionType, Boolean> entry : AllAndOnlyChests.getTrialChambersArrowEffects().entrySet()) {
+            for (HashMap.Entry<PotionType, Boolean> entry : trialChambers.getArrowEffects().entrySet()) {
                 if (!entry.getValue()) {
                     ItemStack tippedArrow = new ItemStack(Material.TIPPED_ARROW);
                     PotionMeta tippedArrowMeta = (PotionMeta) tippedArrow.getItemMeta();
@@ -261,7 +268,7 @@ public class StructureItemMenu extends Menu {
 
         } else {
             for (HashMap.Entry<Material, Boolean> entry :
-                    AllAndOnlyChests.structureMaterials.get(item.getItemMeta().getItemName()).entrySet()) {
+                    StructureUtility.getStructure(item.getItemMeta().getItemName()).getLoot().entrySet()) {
                 if (!entry.getValue()) {
                     items.add(buildItem(entry.getKey()));
                 }

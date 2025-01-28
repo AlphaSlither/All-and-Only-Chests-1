@@ -1,6 +1,7 @@
 package dev.skippaddin.allAndOnlyChests.commands;
 
 import dev.skippaddin.allAndOnlyChests.AllAndOnlyChests;
+import dev.skippaddin.allAndOnlyChests.challenge.ChallengeData;
 import net.kyori.adventure.text.Component;
 import net.kyori.adventure.text.format.NamedTextColor;
 import org.bukkit.Sound;
@@ -18,15 +19,15 @@ public class ItemDropsCommand implements CommandExecutor {
             if (p.hasPermission("AllAndOnlyChests.command.drops")) {
                 if (args.length == 0) {
                     Component baseComponent = Component.text("Drops are currently: ", NamedTextColor.YELLOW);
-                    if (AllAndOnlyChests.isDropsAllowed()) {
+                    if (ChallengeData.isDropsAllowed()) {
                         p.sendMessage(baseComponent.append(Component.text("ON", NamedTextColor.GREEN)));
                     } else {
                         p.sendMessage(baseComponent.append(Component.text("OFF", NamedTextColor.RED)));
                     }
                 } else if (args.length == 1) {
                     if (args[0].equalsIgnoreCase("toggle")) {
-                        boolean dropsAllowed = AllAndOnlyChests.flipDropsAllowed();
-                        AllAndOnlyChests.setSaved(false);
+                        boolean dropsAllowed = ChallengeData.flipDropsAllowed();
+                        ChallengeData.setSaved(false);
                         Component baseComponent = Component.text("Drops are now: ", NamedTextColor.YELLOW);
                         if (dropsAllowed) {
                             p.sendMessage(baseComponent.append(Component.text("ON", NamedTextColor.GREEN)));
