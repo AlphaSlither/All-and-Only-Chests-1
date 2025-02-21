@@ -4,8 +4,7 @@ import com.destroystokyo.paper.event.block.BlockDestroyEvent;
 import dev.skippaddin.allAndOnlyChests.challenge.ChallengeData;
 import org.bukkit.Material;
 import org.bukkit.block.*;
-import org.bukkit.entity.Item;
-import org.bukkit.entity.ItemFrame;
+import org.bukkit.entity.*;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.block.*;
@@ -87,7 +86,21 @@ public class ItemDropListener implements Listener {
     @EventHandler
     public void onEntityDeath(EntityDeathEvent e) {
         if (!ChallengeData.isDropsAllowed()) {
-            e.getDrops().clear();
+            if (!(e.getEntityType() == EntityType.ENDERMAN || e.getEntityType() == EntityType.BLAZE)) {
+                e.getDrops().clear();
+            } else {
+                ItemStack item = null;
+                for (ItemStack itemStack : e.getDrops()) {
+                    if (itemStack.getType() == Material.ENDER_PEARL || itemStack.getType() == Material.BLAZE_ROD) {
+                        item = itemStack;
+                        break;
+                    }
+                }
+                e.getDrops().clear();
+                if (item != null) {
+                    e.getDrops().add(item);
+                }
+            }
         }
     }
 

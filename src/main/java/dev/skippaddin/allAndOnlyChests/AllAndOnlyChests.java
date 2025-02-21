@@ -19,14 +19,27 @@ import org.bukkit.scheduler.BukkitRunnable;
 
 import java.util.*;
 
-
+/**
+ * Main class getting initialized by the Server when loading the plugin
+ */
 public final class AllAndOnlyChests extends JavaPlugin implements Listener {
 
+    /**
+     * Plugin instance to get access to non-static fields and methods
+     */
     private static AllAndOnlyChests plugin;
 
+    /**
+     * Utility Map to store PlayerMenuUtility for loading Menus for specific players
+     */
     private static final HashMap<Player, PlayerMenuUtility> playerMenuUtilityMap = new HashMap<>();
 
-
+    /**
+     * Returns a PlayerMenuUtility for a player. Generates one if it does not yet exist and adds it to the
+     * playerMenuUtilityMap
+     * @param p the Player instance
+     * @return a PlayerUtilityMap to pass to Menus.
+     */
     public static PlayerMenuUtility getPlayerMenuUtility(Player p) {
         PlayerMenuUtility playerMenuUtility;
         if (!playerMenuUtilityMap.containsKey(p)) {
@@ -38,17 +51,28 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         }
     }
 
+    /**
+     * Removes a PlayerMenuUtility from the map
+     * @param p the player instance
+     */
     public static void removePlayerFromUtility(Player p) {
         playerMenuUtilityMap.remove(p);
     }
 
+    /**
+     * @return The instance of the plugin
+     */
     public static AllAndOnlyChests getPlugin() {
         return plugin;
     }
 
+    /**
+     * Startup logic of the Plugin.
+     * Saves the predefined config if it does not exist.
+     * Registers EventListeners and CommandExecutors
+     */
     @Override
     public void onEnable() {
-        // Plugin startup logic
         saveDefaultConfig();
 
         loadData();
@@ -76,12 +100,18 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         }.runTaskTimer(this, 6000, 6000);
     }
 
+    /**
+     * Shutdown logic.
+     */
     @Override
     public void onDisable() {
         // Plugin shutdown logic
         saveData();
     }
 
+    /**
+     * Saves the data to the config. No database used, because the data is pretty limited.
+     */
     public void saveData() {
         getLogger().info("Saving data...");
         if (!ChallengeData.getSaved()) {
@@ -163,6 +193,9 @@ public final class AllAndOnlyChests extends JavaPlugin implements Listener {
         }
     }
 
+    /**
+     * Loads the data from the config.
+     */
     private void loadData() {
         getLogger().info("Loading data...");
 

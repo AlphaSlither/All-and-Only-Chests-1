@@ -56,6 +56,8 @@ public class StructureLootListener implements Listener {
                     }
                 }
                 if (structureChest) {
+                    StructureScoreboard scoreboard = StructureScoreboard.getInstance();
+                    scoreboard.updateChests();
                     if (!ChallengeData.getSelectedStructure().getName().equals("bastion") && !ChallengeData.getSelectedStructure().getName().equals("trial_chambers")) {
                         HashMap<Material, Boolean> structureMats = ChallengeData.getSelectedStructure().getLoot();
                         ArrayList<Component> newItems = new ArrayList<>();
@@ -149,7 +151,6 @@ public class StructureLootListener implements Listener {
         }
         StructureScoreboard scoreboard = StructureScoreboard.getInstance();
         scoreboard.updateItems(items.size());
-        scoreboard.updateChests();
     }
 
     @EventHandler

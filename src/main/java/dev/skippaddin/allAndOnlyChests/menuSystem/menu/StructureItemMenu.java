@@ -231,7 +231,7 @@ public class StructureItemMenu extends Menu {
                     items.add(buildItem(entry.getKey()));
                 }
             }
-            for (HashMap.Entry<Material, Boolean> entry : bastionRemnant.getLoot().entrySet()) {
+            for (HashMap.Entry<Material, Boolean> entry : bastionRemnant.getEnchantedLoot().entrySet()) {
                 if (!entry.getValue()) {
                     items.add(buildEnchantedItem(entry.getKey()));
                 }
